@@ -1,9 +1,9 @@
-import React from 'react'
 import {
   Box,
   Button,
-  CssBaseline,
+  FormControl,
   Grid,
+  Paper,
   TextField,
   Typography
 } from '@mui/material'
@@ -14,92 +14,80 @@ import logoImage from '/public/images/logo.png'
 
 export default function LoginPage () {
   return (
-    <div>
-      <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        <Grid container>
-          <Grid item xs={12} md={5}>
-            <Box sx={{ position: 'relative', height: '100vh' }}>
-              <Image src={authBackground} layout='fill' objectFit='cover' />
-            </Box>
-          </Grid>
+    <Paper sx={{ display: 'flex' }}>
+      <Grid container>
+        <Grid item xs={12} md={5}>
+          <Box sx={{ position: 'relative', height: '100vh' }}>
+            <Image src={authBackground} layout='fill' objectFit='cover' />
+          </Box>
+        </Grid>
 
-          <Grid item xs={12} md={7}>
+        <Grid item xs={12} md={7}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '80vh'
+            }}
+          >
             <Box
+              width={550}
+              height={400}
               sx={{
                 display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                bgcolor: 'black',
-                height: '100vh'
+                flexDirection: 'column',
+                alignItems: 'center'
               }}
             >
-              <Box
-                width={550}
-                height={400}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}
-              >
-                <Box sx={{ marginBottom: 2 }}>
-                  <Image src={logoImage} width={350} height={150} />
-                </Box>
-                <Box
-                  border={2}
-                  borderColor={'#e37d7d'}
-                  width={550}
-                  height={400}
+              <Box sx={{ marginBottom: 2 }}>
+                <Image src={logoImage} width={350} height={150} />
+              </Box>
+              <Box border={2} borderColor={'#e37d7d'} width={550} height={400}>
+                <FormControl
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center'
                   }}
                 >
-                  <Typography
-                    variant='h5'
-                    color={'white'}
-                    sx={{ marginBottom: 2, marginTop: 2 }}
-                  >
+                  <Typography variant='h5' marginTop={2}>
                     Digite suas credenciais
                   </Typography>
 
                   <TextField
                     label='Nome de usuário'
-                    InputLabelProps={{ sx: { color: 'white' } }}
+                    margin='normal'
                     sx={{
-                      width: '35vh',
-                      marginBottom: 2,
-                      input: {
-                        background: 'grey'
-                      }
+                      width: '35vh'
                     }}
                   />
+
                   <TextField
                     label='Senha'
-                    InputLabelProps={{ sx: { color: 'white' } }}
+                    margin='normal'
                     sx={{
-                      width: '35vh',
-                      marginBottom: 2,
-                      input: {
-                        background: 'grey'
-                      }
+                      width: '35vh'
                     }}
                   />
+
                   <Button
                     variant='contained'
                     color='inherit'
-                    sx={{ marginBottom: 2, width: '20vh', height: '4vh' }}
+                    sx={{
+                      margin: 2,
+                      width: '20vh',
+                      height: '4vh'
+                    }}
                   >
                     Entrar
                   </Button>
-                </Box>
+                </FormControl>
               </Box>
             </Box>
-          </Grid>
+          </Box>
         </Grid>
-      </Box>
-    </div>
+      </Grid>
+    </Paper>
   )
 }
