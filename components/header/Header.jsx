@@ -30,10 +30,11 @@ export default function Header () {
       <Container maxWidth='xl'>
         <Toolbar>
           <Image src={logoImage} width={130} height={50} />
-          <Typography variant='h6' sx={{ flexGrow: 1, marginLeft: 2 }}>
+          <Typography variant='h6' sx={{ flexGrow: 1, ml: 2 }}>
             Painel Principal - Dashboard
           </Typography>
 
+          <Typography variant='h6'>Lucas Vinicius</Typography>
           <div>
             <IconButton size='large' onClick={handleMenu}>
               <AccountCircle />
