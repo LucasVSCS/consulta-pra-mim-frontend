@@ -1,46 +1,38 @@
-import { Box, Grid, Paper, Typography } from '@mui/material'
+import { Box, Paper } from '@mui/material'
 
-import Header from '../../components/header/Header'
-import DashBoardTable from '../../components/table/DashboardTable'
+import Header from '../../components/Header'
+import DashBoardTable from '../../components/DashboardTable'
+import DataBox from '../../components/DataBox'
 
 export default function Dashboard () {
   return (
-    <Paper>
+    <Paper sx={{ height: '100vh' }}>
       <Box marginBottom={5}>
         <Header />
       </Box>
 
-      <Grid container>
-        {/* Inicio Barra Lateral com dados estatisticos */}
-        <Grid
-          item
-          container
-          xs={4}
-          direction='column'
-          justifyContent='space-between'
+      {/* Start Sidebar with statistical data */}
+      <Box display='flex'>
+        <Box
+          display='flex'
+          flexDirection='column'
           alignItems='center'
-          height={'100vh'}
+          width='20%'
         >
-          <Grid item xs={6}>
-            <Box border={2} borderColor={'#e37d7d'} width={250} height={250}>
-              <Typography border={2} borderColor={'#e37d7d'} variant='h6'>
-                574
-              </Typography>
-              <Typography border={2} borderColor={'#e37d7d'} variant='h6'>
-                Consultores ativos
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={6}>
-            <Box border={2} borderColor={'#e37d7d'} width={250} height={250} />
-          </Grid>
-        </Grid>
-        {/* Fim Barra Lateral com dados estatisticos */}
+          <DataBox value={'574'} label={'Consultores cadastrados'} />
 
-        <Grid item xs={7}>
+          <DataBox
+            value={'574'}
+            label={'Consultores cadastrados'}
+            marginTop={25}
+          />
+        </Box>
+        {/* End Sidebar with statistical data */}
+
+        <Box width='70%'>
           <DashBoardTable />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Paper>
   )
 }
