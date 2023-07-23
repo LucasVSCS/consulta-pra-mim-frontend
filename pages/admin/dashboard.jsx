@@ -7,9 +7,7 @@ import DataBox from '../../components/DataBox'
 export default function Dashboard () {
   return (
     <Paper sx={{ height: '100vh' }}>
-      <Box marginBottom={5}>
-        <Header />
-      </Box>
+      <Header title={'Painel Principal - Dashboard'} />
 
       {/* Start Sidebar with statistical data */}
       <Box display='flex'>
@@ -19,11 +17,11 @@ export default function Dashboard () {
           alignItems='center'
           width='20%'
         >
-          <DataBox value={'574'} label={'Consultores cadastrados'} />
+          <DataBox value={'574'} label={'Consultores ativos'} />
 
           <DataBox
             value={'574'}
-            label={'Consultores cadastrados'}
+            label={'Consultores pendentes de aprovação'}
             marginTop={25}
           />
         </Box>

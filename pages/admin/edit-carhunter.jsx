@@ -26,18 +26,27 @@ export default function EditCarHunter () {
   }
   return (
     <Paper sx={{ height: '100%' }}>
-      <Header />
+      <Header title={'Edit Automotive Consultant'} />
 
       <Box display='flex' flexDirection='column' alignItems='center'>
-        <h2>Edit Automotive Consultant</h2>
-
-        <Box component='form' maxWidth={800} marginBottom={2}>
+        <Box
+          component='form'
+          maxWidth={1500}
+          marginBottom={2}
+          sx={{ backgroundColor: '#2F2F2F', padding: 2 }}
+        >
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Typography variant='h6' marginBottom={1}>
-                Personal Information
+            <Grid item xs={12} sm={2}>
+              <Typography
+                display='flex'
+                justifyContent='center'
+                alignItems='center'
+                variant='h6'
+                marginBottom={1}
+              >
+                Dados do consultor
               </Typography>
-              <Box border={2} borderColor={'#e37d7d'}>
+              <Box display='flex' justifyContent='center' alignItems='center'>
                 <input
                   type='file'
                   accept='image/*'
@@ -54,7 +63,7 @@ export default function EditCarHunter () {
                 </label>
               </Box>
             </Grid>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={10}>
               <TextField
                 fullWidth
                 label='Name'
