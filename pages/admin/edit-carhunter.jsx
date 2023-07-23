@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import Header from '../../components/Header'
 import { useState } from 'react'
+import Head from 'next/head'
 
 export default function EditCarHunter () {
   const [profilePicture, setProfilePicture] = useState(
@@ -26,6 +27,10 @@ export default function EditCarHunter () {
   }
   return (
     <Paper sx={{ height: '100%' }}>
+      <Head>
+        <title>Edit Automotive Consultant</title>
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
       <Header title={'Edit Automotive Consultant'} />
 
       <Box display='flex' flexDirection='column' alignItems='center'>

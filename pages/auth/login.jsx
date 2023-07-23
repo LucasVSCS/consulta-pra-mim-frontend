@@ -11,10 +11,16 @@ import Image from 'next/image'
 
 import authBackground from '/public/images/auth-background.jpg'
 import logoImage from '/public/images/logo.png'
+import Head from 'next/head'
 
 export default function LoginPage () {
   return (
     <Paper sx={{ display: 'flex' }}>
+      <Head>
+        <title>Painel - Login</title>
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+
       <Grid container>
         <Grid item xs={12} md={5}>
           <Box sx={{ position: 'relative', height: '100vh' }}>

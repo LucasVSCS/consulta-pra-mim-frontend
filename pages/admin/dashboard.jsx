@@ -3,10 +3,15 @@ import { Box, Paper } from '@mui/material'
 import Header from '../../components/Header'
 import DashBoardTable from '../../components/DashboardTable'
 import DataBox from '../../components/DataBox'
+import Head from 'next/head'
 
 export default function Dashboard () {
   return (
     <Paper sx={{ height: '100vh' }}>
+      <Head>
+        <title>Painel Principal - Dashboard</title>
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
       <Header title={'Painel Principal - Dashboard'} />
 
       {/* Start Sidebar with statistical data */}
