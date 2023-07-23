@@ -1,115 +1,101 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import {
+  Box,
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  useTheme
+} from '@mui/material'
+import Image from 'next/image'
+import React from 'react'
+import logoImage from '/public/images/logo.png'
+import backgroundImage from '/public/images/index-background.png'
+import Head from 'next/head'
 
-export default function Home() {
+export default function HomePage () {
+  const theme = useTheme()
+
   return (
-    <div className={styles.container}>
+    <Box sx={{ height: '100vh', display: 'flex' }}>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Consulta pra mim</title>
+        <link rel='icon' href='/favicon.ico' />
       </Head>
-
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      
+      <Box sx={{ flex: 1, position: 'relative' }}>
+        <Image
+          src={backgroundImage}
+          layout='fill'
+          objectFit='cover'
+          alt='Background Image'
+        />
+      </Box>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Box
+          border={2}
+          borderColor={'#f98989'}
+          sx={{
+            minWidth: '700px',
+            minHeight: '300px',
+            position: 'absolute',
+            left: '40%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            backgroundColor: theme.palette.background.paper,
+            padding: 2,
+            display: 'flex',
+            flexDirection: 'column'
+          }}
         >
-          Powered y{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+          <Box marginBottom={2}>
+            <Image src={logoImage} width={230} height={100} />
+          </Box>
+          <Typography variant='h6' align='center' sx={{ fontWeight: 'bold' }}>
+            A melhor disponibilidade de Car Hunters perto de você
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <TextField
+              size='small'
+              sx={{ width: '55%' }}
+              label='Onde deseja encontrar seu consultor?'
+              variant='outlined'
+            />
+            <Button
+              variant='contained'
+              color='inherit'
+              sx={{
+                margin: 2,
+                width: '15vh'
+              }}
+            >
+              Pesquisar
+            </Button>
+          </Box>
+          <Typography
+            variant='h6'
+            align='center'
+            sx={{ fontWeight: 'light', fontSize: 15, cursor: 'pointer' }}
+            onClick={() => {}}
+          >
+            Tornar-se um Consultor
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            marginTop: 'auto',
+            marginBottom: 2,
+            marginLeft: 2,
+            marginRight: 2
+          }}
+        ></Box>
+      </Paper>
+    </Box>
   )
 }
