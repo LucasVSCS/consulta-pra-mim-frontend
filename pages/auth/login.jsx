@@ -2,24 +2,44 @@ import {
   Box,
   Button,
   FormControl,
-  Grid,
   Paper,
   TextField,
   Typography
 } from '@mui/material'
 import Image from 'next/image'
+import { useState } from 'react'
 
 import authBackground from '/public/images/auth-background.jpg'
-import logoImage from '/public/images/logo.png'
-import Head from 'next/head'
+import PageTitle from '../../components/PageTitle'
+import LogoImage from '../../components/LogoImage'
+import { login } from '../../services/actions/authAction'
+import { useRouter } from 'next/router'
 
 export default function LoginPage () {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+
+  const router = useRouter()
+
+  const handleLogin = async () => {
+    const result = await login(username, password)
+    if (result.success) {
+      router.push('/admin/dashboard')
+    } else {
+      setError(result.error)
+    }
+  }
+
+  const propsLogo = {
+    width: 350,
+    height: 150,
+    marginBottom: 2
+  }
+
   return (
     <Paper sx={{ display: 'flex' }}>
-      <Head>
-        <title>Painel - Login</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+      <PageTitle label='Painel - Login' />
 
       <Box
         sx={{
@@ -49,9 +69,7 @@ export default function LoginPage () {
             alignItems: 'center'
           }}
         >
-          <Box sx={{ marginBottom: 2 }}>
-            <Image src={logoImage} width={350} height={150} />
-          </Box>
+          <LogoImage {...propsLogo} />
           <Box border={2} borderColor={'#e37d7d'} width={550} height={400}>
             <FormControl
               sx={{
@@ -60,13 +78,16 @@ export default function LoginPage () {
                 alignItems: 'center'
               }}
             >
-              <Typography variant='h5' marginTop={2}>
+              <Typography variant='h6' marginTop={2}>
                 Digite suas credenciais
               </Typography>
 
               <TextField
                 label='Nome de usuário'
                 margin='normal'
+                size='small'
+                value={username}
+                onChange={event => setUsername(event.target.value)}
                 sx={{
                   width: '35vh'
                 }}
@@ -74,7 +95,11 @@ export default function LoginPage () {
 
               <TextField
                 label='Senha'
+                type='password'
                 margin='normal'
+                size='small'
+                value={password}
+                onChange={event => setPassword(event.target.value)}
                 sx={{
                   width: '35vh'
                 }}
@@ -83,6 +108,7 @@ export default function LoginPage () {
               <Button
                 variant='contained'
                 color='inherit'
+                onClick={handleLogin}
                 sx={{
                   margin: 2,
                   width: '20vh',
