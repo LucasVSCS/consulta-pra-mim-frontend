@@ -6,7 +6,7 @@ import DashBoardTable from '../../components/DashboardTable'
 import DataBox from '../../components/DataBox'
 import Head from 'next/head'
 
-export default function Dashboard () {
+export default function Dashboard ({ data }) {
   return (
     <Paper sx={{ height: '100vh' }}>
       <Head>
@@ -34,7 +34,7 @@ export default function Dashboard () {
         {/* End Sidebar with statistical data */}
 
         <Box width='70%'>
-          <DashBoardTable />
+          <DashBoardTable data={data} />
         </Box>
       </Box>
     </Paper>
@@ -54,7 +54,15 @@ export const getServerSideProps = async ctx => {
     }
   }
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  const response = await fetch(`${apiUrl}/car-hunters`)
+  const data = await response.json()
+
+  console.log(data)
+
   return {
-    props: {}
+    props: {
+      data: data.content
+    }
   }
 }

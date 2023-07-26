@@ -1,7 +1,7 @@
 import React from 'react'
 import MUIDataTable from 'mui-datatables'
 
-export default function DashboardTable () {
+export default function DashboardTable ({ data }) {
   const columns = [
     {
       name: 'name',
@@ -12,7 +12,7 @@ export default function DashboardTable () {
       }
     },
     {
-      name: 'trading_name',
+      name: 'tradingName',
       label: 'Nome Consultoria',
       options: {
         filter: true,
@@ -32,40 +32,22 @@ export default function DashboardTable () {
       label: 'Cidade',
       options: {
         filter: true,
-        sort: false
+        sort: false,
+        customBodyRender: (value, tableMeta, updateValue) => {
+          return `${value.name} - ${value.ufCode}`
+        }
       }
     },
     {
-      name: 'status',
+      name: 'active',
       label: 'Status',
       options: {
         filter: true,
-        sort: false
+        sort: false,
+        customBodyRender: (value, tableMeta, updateValue) => {
+          return value ? 'Ativo' : 'Inativo'
+        }
       }
-    }
-  ]
-
-  const data = [
-    {
-      name: 'John Smith',
-      trading_name: 'Smith Consulting',
-      email: 'john.smith@example.com',
-      city: 'New York',
-      status: 'Active'
-    },
-    {
-      name: 'Jane Doe',
-      trading_name: 'Doe Consulting',
-      email: 'jane.doe@example.com',
-      city: 'Los Angeles',
-      status: 'Inactive'
-    },
-    {
-      name: 'Bob Johnson',
-      trading_name: 'Johnson Consulting',
-      email: 'bob.johnson@example.com',
-      city: 'Chicago',
-      status: 'Active'
     }
   ]
 
