@@ -1,3 +1,5 @@
+import { setCookie } from 'nookies'
+
 export const login = async (username, password) => {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -17,7 +19,11 @@ export const login = async (username, password) => {
     }
 
     const data = await response.json()
-    sessionStorage.setItem('token', data.jwtToken)
+
+    setCookie(null, 'token', data.jwtToken, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/'
+    })
     return { success: true }
   } catch (error) {
     return { success: false, error: error.message }

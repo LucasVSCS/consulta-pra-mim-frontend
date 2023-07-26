@@ -6,14 +6,15 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import Image from 'next/image'
 import { useState } from 'react'
+import { parseCookies } from 'nookies'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import authBackground from '/public/images/auth-background.jpg'
 import PageTitle from '../../components/PageTitle'
 import LogoImage from '../../components/LogoImage'
 import { login } from '../../services/actions/authAction'
-import { useRouter } from 'next/router'
 
 export default function LoginPage () {
   const [username, setUsername] = useState('')
@@ -123,4 +124,22 @@ export default function LoginPage () {
       </Box>
     </Paper>
   )
+}
+
+export const getServerSideProps = async ctx => {
+  const cookies = parseCookies(ctx)
+  const token = cookies.token
+
+  if (token) {
+    return {
+      redirect: {
+        destination: '/admin/dashboard',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {}
+  }
 }

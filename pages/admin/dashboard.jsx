@@ -1,4 +1,5 @@
 import { Box, Paper } from '@mui/material'
+import { parseCookies } from 'nookies'
 
 import Header from '../../components/Header'
 import DashBoardTable from '../../components/DashboardTable'
@@ -38,4 +39,22 @@ export default function Dashboard () {
       </Box>
     </Paper>
   )
+}
+
+export const getServerSideProps = async ctx => {
+  const cookies = parseCookies(ctx)
+  const token = cookies.token
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {}
+  }
 }
