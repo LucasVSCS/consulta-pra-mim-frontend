@@ -1,7 +1,35 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
+import { useRouter } from 'next/router'
 
-export default function DashboardTable ({ data }) {
+export default function DashboardTable ({ fetchData }) {
+  const [data, setData] = useState([])
+  const [page, setPage] = useState(0)
+  const [count, setCount] = useState(0)
+  const [sort, setSort] = useState('name')
+  const [order, setOrder] = useState('asc')
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const router = useRouter()
+
+  useEffect(() => {
+    fetchData(page, sort, order, rowsPerPage).then(result => {
+      setData(result.data)
+      setCount(result.total)
+    })
+  }, [fetchData, page, sort, order, rowsPerPage])
+
+  const options = {
+    filterType: 'checkbox',
+    serverSide: true,
+    count: count,
+    page: page,
+    onTableChange: (action, tableState) => {
+      if (action === 'changePage') {
+        setPage(tableState.page)
+      }
+    }
+  }
+
   const columns = [
     {
       name: 'name',
@@ -48,12 +76,23 @@ export default function DashboardTable ({ data }) {
           return value ? 'Ativo' : 'Inativo'
         }
       }
+    },
+    {
+      name: 'externalId',
+      label: 'Ações',
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: (value, tableMeta, updateValue) => {
+          return (
+            <button onClick={() => router.push(`/admin/edit-carhunter/${value}`)}>
+              Editar
+            </button>
+          )
+        }
+      }
     }
   ]
-
-  const options = {
-    filterType: 'checkbox'
-  }
 
   return (
     <MUIDataTable

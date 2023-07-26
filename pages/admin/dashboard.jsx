@@ -6,7 +6,21 @@ import DashBoardTable from '../../components/DashboardTable'
 import DataBox from '../../components/DataBox'
 import Head from 'next/head'
 
-export default function Dashboard ({ data }) {
+export default function Dashboard () {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+  const fetchData = async (page, sort, order, rowsPerPage) => {
+    const response = await fetch(
+      `${apiUrl}/car-hunters?page=${page}&sort=${sort}&order=${order}&size=${rowsPerPage}`
+    )
+
+    const data = await response.json()
+    return {
+      data: data.content,
+      total: data.totalElements
+    }
+  }
+
   return (
     <Paper sx={{ height: '100vh' }}>
       <Head>
@@ -15,7 +29,6 @@ export default function Dashboard ({ data }) {
       </Head>
       <Header title={'Painel Principal - Dashboard'} />
 
-      {/* Start Sidebar with statistical data */}
       <Box display='flex'>
         <Box
           display='flex'
@@ -31,10 +44,9 @@ export default function Dashboard ({ data }) {
             marginTop={25}
           />
         </Box>
-        {/* End Sidebar with statistical data */}
 
         <Box width='70%'>
-          <DashBoardTable data={data} />
+          <DashBoardTable fetchData={fetchData} />
         </Box>
       </Box>
     </Paper>
@@ -54,15 +66,7 @@ export const getServerSideProps = async ctx => {
     }
   }
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
-  const response = await fetch(`${apiUrl}/car-hunters`)
-  const data = await response.json()
-
-  console.log(data)
-
   return {
-    props: {
-      data: data.content
-    }
+    props: {}
   }
 }

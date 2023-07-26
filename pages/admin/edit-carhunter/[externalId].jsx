@@ -9,11 +9,14 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import Header from '../../components/Header'
+import Header from '../../../components/Header'
 import { useState } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 export default function EditCarHunter () {
+  const router = useRouter()
+  const { externalId } = router.query
   const [profilePicture, setProfilePicture] = useState(
     'https://i.pravatar.cc/300'
   )
