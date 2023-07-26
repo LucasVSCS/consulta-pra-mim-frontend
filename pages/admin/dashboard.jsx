@@ -11,7 +11,7 @@ export default function Dashboard () {
 
   const fetchData = async (page, sort, order, rowsPerPage) => {
     const response = await fetch(
-      `${apiUrl}/car-hunters?page=${page}&sort=${sort}&order=${order}&size=${rowsPerPage}`
+      `${apiUrl}/car-hunters?pageNo=${page}&sortBy=${sort}&sortOrder=${order}&pageSize=${rowsPerPage}`
     )
 
     const data = await response.json()

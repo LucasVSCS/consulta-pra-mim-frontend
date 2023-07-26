@@ -24,8 +24,19 @@ export default function DashboardTable ({ fetchData }) {
     count: count,
     page: page,
     onTableChange: (action, tableState) => {
-      if (action === 'changePage') {
-        setPage(tableState.page)
+      switch (action) {
+        case 'sort':
+          setSort(tableState.columns[tableState.activeColumn].name)
+          setOrder(tableState.sortOrder.direction)
+          break
+        case 'changeRowsPerPage':
+          setRowsPerPage(tableState.rowsPerPage)
+          break
+        case 'changePage':
+          setPage(tableState.page)
+          break
+        default:
+          break
       }
     }
   }
@@ -35,7 +46,7 @@ export default function DashboardTable ({ fetchData }) {
       name: 'name',
       label: 'Nome',
       options: {
-        filter: true,
+        filter: false,
         sort: true
       }
     },
@@ -43,15 +54,15 @@ export default function DashboardTable ({ fetchData }) {
       name: 'tradingName',
       label: 'Nome Consultoria',
       options: {
-        filter: true,
-        sort: false
+        filter: false,
+        sort: true
       }
     },
     {
       name: 'email',
       label: 'Email',
       options: {
-        filter: true,
+        filter: false,
         sort: false
       }
     },
@@ -85,7 +96,9 @@ export default function DashboardTable ({ fetchData }) {
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
-            <button onClick={() => router.push(`/admin/edit-carhunter/${value}`)}>
+            <button
+              onClick={() => router.push(`/admin/edit-carhunter/${value}`)}
+            >
               Editar
             </button>
           )
