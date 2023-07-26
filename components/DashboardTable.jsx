@@ -1,28 +1,67 @@
 import React, { useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
 import { useRouter } from 'next/router'
+import {
+  Autocomplete,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField
+} from '@mui/material'
 
 export default function DashboardTable ({ fetchData }) {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const [data, setData] = useState([])
   const [page, setPage] = useState(0)
   const [count, setCount] = useState(0)
   const [sort, setSort] = useState('name')
   const [order, setOrder] = useState('asc')
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [status, setStatus] = useState('')
+  const [cityId, setCityId] = useState('')
+  const [name, setName] = useState('')
+  const [tradingName, setTradingName] = useState('')
+  const [citySearchResults, setCitySearchResults] = useState([])
   const router = useRouter()
 
   useEffect(() => {
-    fetchData(page, sort, order, rowsPerPage).then(result => {
+    fetchData(
+      page,
+      sort,
+      order,
+      rowsPerPage,
+      status,
+      cityId,
+      name,
+      tradingName
+    ).then(result => {
       setData(result.data)
       setCount(result.total)
     })
-  }, [fetchData, page, sort, order, rowsPerPage])
+  }, [
+    fetchData,
+    page,
+    sort,
+    order,
+    rowsPerPage,
+    status,
+    cityId,
+    name,
+    tradingName
+  ])
 
   const options = {
     filterType: 'checkbox',
     serverSide: true,
     count: count,
     page: page,
+    filter: false,
+    selectableRows: 'none',
+    disableToolbarSelect: true,
+    rowsPerPageOptions: [5, 10, 25, 50, 100],
+    search: false,
+    viewColumns: false,
     onTableChange: (action, tableState) => {
       switch (action) {
         case 'sort':
@@ -46,7 +85,6 @@ export default function DashboardTable ({ fetchData }) {
       name: 'name',
       label: 'Nome',
       options: {
-        filter: false,
         sort: true
       }
     },
@@ -54,7 +92,6 @@ export default function DashboardTable ({ fetchData }) {
       name: 'tradingName',
       label: 'Nome Consultoria',
       options: {
-        filter: false,
         sort: true
       }
     },
@@ -62,7 +99,6 @@ export default function DashboardTable ({ fetchData }) {
       name: 'email',
       label: 'Email',
       options: {
-        filter: false,
         sort: false
       }
     },
@@ -70,7 +106,6 @@ export default function DashboardTable ({ fetchData }) {
       name: 'city',
       label: 'Cidade',
       options: {
-        filter: true,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return `${value.name} - ${value.ufCode}`
@@ -81,7 +116,6 @@ export default function DashboardTable ({ fetchData }) {
       name: 'active',
       label: 'Status',
       options: {
-        filter: true,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return value ? 'Ativo' : 'Inativo'
@@ -107,12 +141,64 @@ export default function DashboardTable ({ fetchData }) {
     }
   ]
 
+  const handleCitySearch = async event => {
+    const value = event.target.value
+    if (value.length >= 3) {
+      const response = await fetch(`${apiUrl}/cities/get-by-name?name=${value}`)
+      const data = await response.json()
+      setCitySearchResults(data)
+    } else {
+      setCitySearchResults([])
+    }
+  }
+
   return (
-    <MUIDataTable
-      title={'Lista de Consultores Cadastrados'}
-      data={data}
-      columns={columns}
-      options={options}
-    />
+    <>
+      <div>
+        <TextField
+          size='small'
+          label='Nome'
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
+        <TextField
+          size='small'
+          label='Nome da Consultoria'
+          value={tradingName}
+          onChange={e => setTradingName(e.target.value)}
+        />
+        <FormControl size='small' sx={{ minWidth: 120 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={status}
+            onChange={e => setStatus(e.target.value)}
+            label='Status'
+          >
+            <MenuItem value=''>
+              <em>Todos</em>
+            </MenuItem>
+            <MenuItem value='1'>Ativo</MenuItem>
+            <MenuItem value='0'>Inativo</MenuItem>
+          </Select>
+        </FormControl>
+        <Autocomplete
+          size='small'
+          options={citySearchResults}
+          getOptionLabel={option => `${option.name} - ${option.ufCode}`}
+          onChange={(event, newValue) => {
+            setCityId(newValue ? newValue.id : '')
+          }}
+          renderInput={params => (
+            <TextField {...params} label='Cidade' onChange={handleCitySearch} />
+          )}
+        />
+      </div>
+      <MUIDataTable
+        title={'Lista de Consultores Cadastrados'}
+        data={data}
+        columns={columns}
+        options={options}
+      />
+    </>
   )
 }

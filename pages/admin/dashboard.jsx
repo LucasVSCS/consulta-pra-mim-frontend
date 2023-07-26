@@ -9,9 +9,18 @@ import Head from 'next/head'
 export default function Dashboard () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-  const fetchData = async (page, sort, order, rowsPerPage) => {
+  const fetchData = async (
+    page,
+    sort,
+    order,
+    rowsPerPage,
+    status,
+    cityId,
+    name,
+    tradingName
+  ) => {
     const response = await fetch(
-      `${apiUrl}/car-hunters?pageNo=${page}&sortBy=${sort}&sortOrder=${order}&pageSize=${rowsPerPage}`
+      `${apiUrl}/car-hunters?pageNo=${page}&sortBy=${sort}&sortOrder=${order}&pageSize=${rowsPerPage}&status=${status}&cityId=${cityId}&name=${name}&tradingName=${tradingName}`
     )
 
     const data = await response.json()
