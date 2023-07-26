@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import {
   Autocomplete,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -154,45 +155,57 @@ export default function DashboardTable ({ fetchData }) {
 
   return (
     <>
-      <div>
-        <TextField
-          size='small'
-          label='Nome'
-          value={name}
-          onChange={e => setName(e.target.value)}
-        />
-        <TextField
-          size='small'
-          label='Nome da Consultoria'
-          value={tradingName}
-          onChange={e => setTradingName(e.target.value)}
-        />
-        <FormControl size='small' sx={{ minWidth: 120 }}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={status}
-            onChange={e => setStatus(e.target.value)}
-            label='Status'
-          >
-            <MenuItem value=''>
-              <em>Todos</em>
-            </MenuItem>
-            <MenuItem value='1'>Ativo</MenuItem>
-            <MenuItem value='0'>Inativo</MenuItem>
-          </Select>
-        </FormControl>
-        <Autocomplete
-          size='small'
-          options={citySearchResults}
-          getOptionLabel={option => `${option.name} - ${option.ufCode}`}
-          onChange={(event, newValue) => {
-            setCityId(newValue ? newValue.id : '')
-          }}
-          renderInput={params => (
-            <TextField {...params} label='Cidade' onChange={handleCitySearch} />
-          )}
-        />
-      </div>
+      <Grid container spacing={1} mb>
+        <Grid item xs>
+          <TextField
+            fullWidth
+            label='Nome'
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs>
+          <TextField
+            fullWidth
+            label='Nome da Consultoria'
+            value={tradingName}
+            onChange={e => setTradingName(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs>
+          <Autocomplete
+            fullWidth
+            options={citySearchResults}
+            getOptionLabel={option => `${option.name} - ${option.ufCode}`}
+            onChange={(event, newValue) => {
+              setCityId(newValue ? newValue.id : '')
+            }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label='Cidade'
+                onChange={handleCitySearch}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={status}
+              onChange={e => setStatus(e.target.value)}
+              label='Status'
+            >
+              <MenuItem value=''>
+                <em>Todos</em>
+              </MenuItem>
+              <MenuItem value='1'>Ativo</MenuItem>
+              <MenuItem value='0'>Inativo</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
       <MUIDataTable
         title={'Lista de Consultores Cadastrados'}
         data={data}
