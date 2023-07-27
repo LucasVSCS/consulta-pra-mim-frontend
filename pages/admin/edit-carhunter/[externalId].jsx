@@ -1,25 +1,80 @@
 import {
+  Autocomplete,
   Avatar,
   Box,
   Button,
   Checkbox,
   FormControlLabel,
+  FormHelperText,
   Grid,
+  InputAdornment,
+  OutlinedInput,
   Paper,
   TextField,
   Typography
 } from '@mui/material'
 import Header from '../../../components/Header'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 
 export default function EditCarHunter () {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const router = useRouter()
   const { externalId } = router.query
-  const [profilePicture, setProfilePicture] = useState(
-    'https://i.pravatar.cc/300'
-  )
+  const [carHunterData, setcarHunterData] = useState({})
+  const [profilePicture, setProfilePicture] = useState(null)
+  const [phones, setPhones] = useState([{}, {}])
+
+  const [citySearchResults, setCitySearchResults] = useState([])
+  const [selectedCity, setSelectedCity] = useState(null)
+
+  useEffect(() => {
+    if (carHunterData.city) {
+      setSelectedCity({
+        id: carHunterData.city.id,
+        name: carHunterData.city.name,
+        ufCode: carHunterData.city.ufCode
+      })
+    }
+  }, [carHunterData.city])
+
+  const handleCitySearch = async event => {
+    const value = event.target.value
+    if (value.length >= 3) {
+      const response = await fetch(`${apiUrl}/cities/get-by-name?name=${value}`)
+      const data = await response.json()
+      setCitySearchResults(data)
+    } else {
+      setCitySearchResults([])
+    }
+  }
+
+  useEffect(() => {
+    setProfilePicture(carHunterData.logoUrl)
+  }, [carHunterData.logoUrl])
+
+  useEffect(() => {
+    if (carHunterData.phones && carHunterData.phones.length) {
+      setPhones(carHunterData.phones)
+    }
+  }, [carHunterData.phones])
+
+  useEffect(() => {
+    if (!externalId) return
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/car-hunters/${externalId}`)
+        const data = await response.json()
+        setcarHunterData(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchData()
+  }, [externalId])
 
   const handleProfilePictureChange = event => {
     if (event.target.files && event.target.files[0]) {
@@ -28,22 +83,35 @@ export default function EditCarHunter () {
       reader.readAsDataURL(event.target.files[0])
     }
   }
+
+  const handleWhatsAppChange = (event, index) => {
+    setPhones(prevPhones => {
+      const newPhones = [...prevPhones]
+      newPhones[index].whatsapp = event.target.checked
+      return newPhones
+    })
+  }
+
   return (
-    <Paper sx={{ height: '100%' }}>
+    <Paper sx={{ height: '100vh' }}>
       <Head>
         <title>Edit Automotive Consultant</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Header title={'Edit Automotive Consultant'} />
+      <Header title={'Editar Consultor Automotivo'} />
 
       <Box display='flex' flexDirection='column' alignItems='center'>
         <Box
           component='form'
           maxWidth={1500}
-          marginBottom={2}
-          sx={{ backgroundColor: '#2F2F2F', padding: 2 }}
+          sx={{
+            backgroundColor: '#2F2F2F',
+            padding: 2,
+            border: 2,
+            borderColor: '#f98989'
+          }}
         >
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item xs={12} sm={2}>
               <Typography
                 display='flex'
@@ -71,148 +139,246 @@ export default function EditCarHunter () {
                 </label>
               </Box>
             </Grid>
-            <Grid item xs={12} sm={10}>
+
+            {/* Inicio inputs dos dados do Consultor */}
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Name'
                 margin='normal'
                 variant='outlined'
+                size='small'
+                value={carHunterData.name}
+                InputLabelProps={{ shrink: true }}
               />
-              <TextField
-                fullWidth
-                label='Consultant Name'
-                margin='normal'
-                variant='outlined'
-              />
-            </Grid>
-            <Grid item xs={12} sm={8}>
               <TextField
                 fullWidth
                 label='Email'
                 margin='normal'
+                size='small'
                 variant='outlined'
+                value={carHunterData.email}
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs>
               <TextField
                 fullWidth
-                label='Cidade'
+                label='Consultant Name'
                 margin='normal'
+                size='small'
                 variant='outlined'
+                value={carHunterData.tradingName}
+                InputLabelProps={{ shrink: true }}
+              />
+              <Autocomplete
+                fullWidth
+                size='small'
+                options={citySearchResults}
+                getOptionLabel={option => `${option.name} - ${option.ufCode}`}
+                value={selectedCity}
+                onChange={(event, newValue) => {
+                  setSelectedCity(newValue)
+                }}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Cidade'
+                    onChange={handleCitySearch}
+                  />
+                )}
+              />
+              <FormControlLabel
+                control={<Checkbox checked={carHunterData.active || false} />}
+                label='Usuário ativo'
               />
             </Grid>
+            {/* Fim inputs dos dados do Consultor */}
+
             <Grid item xs={12}>
-              <Typography variant='h6' marginBottom={1} marginTop={2}>
-                Social Media
-              </Typography>
+              <Typography variant='h6'>Redes Sociais</Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
+
+            {/* Inicio inputs dos dados das redes sociais */}
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Facebook'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.socialMedia &&
+                  carHunterData.socialMedia.facebookUrl
+                }
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Instagram'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.socialMedia &&
+                  carHunterData.socialMedia.instagramUrl
+                }
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
+            {/* Fim inputs dos dados das redes sociais */}
+
             <Grid item xs={12}>
-              <Typography variant='h6' marginBottom={1} marginTop={2}>
-                Phones
+              <Typography variant='h6'>Telefones</Typography>
+            </Grid>
+
+            {/* Inicio inputs dos telefones */}
+            {phones.map((phone, index) => (
+              <Grid item xs key={index}>
+                <TextField
+                  fullWidth
+                  label={`Telefone ${index + 1}`}
+                  margin='normal'
+                  variant='outlined'
+                  value={
+                    phone.areaCode && phone.number
+                      ? `${phone.areaCode} ${phone.number}`
+                      : ''
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={phone.whatsapp || false}
+                      onChange={event => handleWhatsAppChange(event, index)}
+                    />
+                  }
+                  label='É Whastapp'
+                />
+              </Grid>
+            ))}
+            {/* Fim inputs dos telefones */}
+
+            <Grid item xs={12}>
+              <Typography variant='h6'>
+                Especificações do serviço de consulta
               </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
+
+            {/* Inicio inputs dos dados do serviço */}
+            <Grid item xs>
+              <OutlinedInput
                 fullWidth
-                label='Telefone 1'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.searchRadius
+                }
+                endAdornment={
+                  <InputAdornment position='end'>km</InputAdornment>
+                }
               />
-              <FormControlLabel control={<Checkbox />} label='É Whastapp' />
+              <FormHelperText>Área de cobertura</FormHelperText>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Telefone 2'
-                margin='normal'
-                variant='outlined'
-              />
-              <FormControlLabel control={<Checkbox />} label='É Whastapp' />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant='h6' marginBottom={1} marginTop={2}>
-                Service Range
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={2}>
-              <TextField
-                fullWidth
-                label='Search Radius'
-                margin='normal'
-                variant='outlined'
-              />
-            </Grid>
-            <Grid item xs={12} sm={2}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Year MIN'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.yearMin
+                }
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={2}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Year MAX'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.yearMax
+                }
+                InputLabelProps={{ shrink: true }}
               />
-              <FormControlLabel control={<Checkbox />} label='0km' />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={
+                      (carHunterData.serviceRange &&
+                        carHunterData.serviceRange.brandNew) ||
+                      false
+                    }
+                  />
+                }
+                label='0km'
+              />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Price MIN'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.priceMin
+                }
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={3}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Price MAX'
-                margin='normal'
-                variant='outlined'
+                size='small'
+                value={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.priceMax
+                }
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
+            {/* Fim inputs dos dados do serviço */}
+
             <Grid item xs={12}>
-              <Typography variant='h6' marginBottom={1} marginTop={2}>
-                Service Information
-              </Typography>
+              <Typography variant='h6'>Descrição do serviço</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs>
               <TextField
                 fullWidth
                 label='Service Description'
                 margin='normal'
-                variant='outlined'
+                size='small'
                 multiline
-                rows={4}
+                rows={10}
+                InputLabelProps={{ shrink: true }}
+                value={carHunterData.serviceDescription}
               />
-              <FormControlLabel control={<Checkbox />} label='Usuário ativo' />
             </Grid>
           </Grid>
+          <Grid item xs alignItems={'end'}>
+            <Button variant='contained'>Save</Button>
+          </Grid>
         </Box>
-        <Button variant='contained' sx={{ marginBottom: 5 }}>
-          Save
-        </Button>
       </Box>
     </Paper>
   )
+}
+
+export const getServerSideProps = async ctx => {
+  const cookies = parseCookies(ctx)
+  const token = cookies.token
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {}
+  }
 }
