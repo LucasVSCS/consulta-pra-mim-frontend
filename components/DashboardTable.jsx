@@ -3,6 +3,7 @@ import MUIDataTable from 'mui-datatables'
 import { useRouter } from 'next/router'
 import {
   Autocomplete,
+  Button,
   FormControl,
   Grid,
   InputLabel,
@@ -12,6 +13,7 @@ import {
 } from '@mui/material'
 
 export default function DashboardTable ({ fetchData }) {
+  const router = useRouter()
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const [data, setData] = useState([])
   const [page, setPage] = useState(0)
@@ -19,12 +21,18 @@ export default function DashboardTable ({ fetchData }) {
   const [sort, setSort] = useState('name')
   const [order, setOrder] = useState('asc')
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [citySearchResults, setCitySearchResults] = useState([])
+
   const [status, setStatus] = useState('')
   const [cityId, setCityId] = useState('')
   const [name, setName] = useState('')
   const [tradingName, setTradingName] = useState('')
-  const [citySearchResults, setCitySearchResults] = useState([])
-  const router = useRouter()
+  const [appliedFilters, setAppliedFilters] = useState({
+    status: '',
+    cityId: '',
+    name: '',
+    tradingName: ''
+  })
 
   useEffect(() => {
     fetchData(
@@ -32,10 +40,10 @@ export default function DashboardTable ({ fetchData }) {
       sort,
       order,
       rowsPerPage,
-      status,
-      cityId,
-      name,
-      tradingName
+      appliedFilters.status,
+      appliedFilters.cityId,
+      appliedFilters.name,
+      appliedFilters.tradingName
     ).then(result => {
       setData(result.data)
       setCount(result.total)
@@ -46,10 +54,10 @@ export default function DashboardTable ({ fetchData }) {
     sort,
     order,
     rowsPerPage,
-    status,
-    cityId,
-    name,
-    tradingName
+    appliedFilters.status,
+    appliedFilters.cityId,
+    appliedFilters.name,
+    appliedFilters.tradingName
   ])
 
   const options = {
@@ -153,12 +161,35 @@ export default function DashboardTable ({ fetchData }) {
     }
   }
 
+  const handleSearch = () => {
+    setAppliedFilters({
+      status: status,
+      cityId: cityId,
+      name: name,
+      tradingName: tradingName
+    })
+  }
+
+  const handleClearFilters = () => {
+    setStatus('')
+    setCityId('')
+    setName('')
+    setTradingName('')
+    setAppliedFilters({
+      status: '',
+      cityId: '',
+      name: '',
+      tradingName: ''
+    })
+  }
+
   return (
     <>
       <Grid container spacing={1} mb>
         <Grid item xs>
           <TextField
             fullWidth
+            size='small'
             label='Nome'
             value={name}
             onChange={e => setName(e.target.value)}
@@ -167,7 +198,8 @@ export default function DashboardTable ({ fetchData }) {
         <Grid item xs>
           <TextField
             fullWidth
-            label='Nome da Consultoria'
+            size='small'
+            label='Nome Consultoria'
             value={tradingName}
             onChange={e => setTradingName(e.target.value)}
           />
@@ -175,6 +207,7 @@ export default function DashboardTable ({ fetchData }) {
         <Grid item xs>
           <Autocomplete
             fullWidth
+            size='small'
             options={citySearchResults}
             getOptionLabel={option => `${option.name} - ${option.ufCode}`}
             onChange={(event, newValue) => {
@@ -190,7 +223,7 @@ export default function DashboardTable ({ fetchData }) {
           />
         </Grid>
         <Grid item xs>
-          <FormControl fullWidth>
+          <FormControl size='small' fullWidth>
             <InputLabel>Status</InputLabel>
             <Select
               value={status}
@@ -204,6 +237,14 @@ export default function DashboardTable ({ fetchData }) {
               <MenuItem value='0'>Inativo</MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+        <Grid item alignSelf={'center'}>
+          <Button variant='contained' fullWidth onClick={handleSearch}>
+            Pesquisar
+          </Button>
+        </Grid>
+        <Grid item alignSelf={'center'}>
+          <Button onClick={handleClearFilters}>Limpar Filtros</Button>
         </Grid>
       </Grid>
       <MUIDataTable
