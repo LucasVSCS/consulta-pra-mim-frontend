@@ -8,6 +8,7 @@ import {
   FormHelperText,
   Grid,
   InputAdornment,
+  InputLabel,
   OutlinedInput,
   Paper,
   TextField,
@@ -18,6 +19,7 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
+import ReactInputMask from 'react-input-mask'
 
 export default function EditCarHunter () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -26,6 +28,7 @@ export default function EditCarHunter () {
   const [carHunterData, setcarHunterData] = useState({})
   const [profilePicture, setProfilePicture] = useState(null)
   const [phones, setPhones] = useState([{}, {}])
+  const [phone, setPhone] = useState('')
 
   const [citySearchResults, setCitySearchResults] = useState([])
   const [selectedCity, setSelectedCity] = useState(null)
@@ -87,9 +90,87 @@ export default function EditCarHunter () {
   const handleWhatsAppChange = (event, index) => {
     setPhones(prevPhones => {
       const newPhones = [...prevPhones]
-      newPhones[index].whatsapp = event.target.checked
+      newPhones[index].isWhatsapp = event.target.checked
       return newPhones
     })
+  }
+
+  const handlePhoneChange = (event, index) => {
+    const value = event.target.value
+    setPhone(value)
+    if (value === '') {
+      setPhones(prevPhones => {
+        const newPhones = [...prevPhones]
+        newPhones[index].areaCode = ''
+        newPhones[index].number = ''
+        return newPhones
+      })
+    } else {
+      const unmaskedValue = value.replace(/\D/g, '')
+      const areaCode = unmaskedValue.slice(0, 2)
+      const number = unmaskedValue.slice(2)
+      setPhones(prevPhones => {
+        const newPhones = [...prevPhones]
+        newPhones[index].areaCode = areaCode
+        newPhones[index].number = number
+        return newPhones
+      })
+    }
+  }
+
+  const formatPhoneNumber = (areaCode, number) => {
+    if (!areaCode || !number) return ''
+    const formattedNumber = `${number.slice(0, 5)}-${number.slice(5)}`
+    return `(${areaCode}) ${formattedNumber}`
+  }
+
+  const handleSave = async () => {
+    const cookies = parseCookies()
+    const token = cookies.token
+
+    const data = {
+      name: carHunterData.name,
+      tradingName: carHunterData.tradingName,
+      email: carHunterData.email,
+      cityId: selectedCity.id,
+      serviceDescription: carHunterData.serviceDescription,
+      isActive: carHunterData.isActive,
+      phones: phones,
+      socialMedia: {
+        facebookUrl: carHunterData.socialMedia.facebookUrl,
+        instagramUrl: carHunterData.socialMedia.instagramUrl
+      },
+      serviceRange: {
+        searchRadius: carHunterData.serviceRange.searchRadius,
+        yearMin: carHunterData.serviceRange.yearMin,
+        yearMax: carHunterData.serviceRange.yearMax,
+        priceMin: carHunterData.serviceRange.priceMin,
+        priceMax: carHunterData.serviceRange.priceMax,
+        brandNew: carHunterData.serviceRange.brandNew
+      }
+    }
+
+    await updateCarHunterData(externalId, data, token)
+  }
+
+  async function updateCarHunterData (externalId, data, token) {
+    try {
+      const response = await fetch(`${apiUrl}/car-hunters/${externalId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`
+        },
+        body: JSON.stringify(data)
+      })
+      if (!response.ok) {
+        throw new Error(`An error occurred: ${response.statusText}`)
+      }
+      const responseData = await response.json()
+      console.log(responseData)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -149,6 +230,12 @@ export default function EditCarHunter () {
                 variant='outlined'
                 size='small'
                 value={carHunterData.name}
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    name: event.target.value
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
@@ -158,6 +245,12 @@ export default function EditCarHunter () {
                 size='small'
                 variant='outlined'
                 value={carHunterData.email}
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    email: event.target.value
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -169,10 +262,17 @@ export default function EditCarHunter () {
                 size='small'
                 variant='outlined'
                 value={carHunterData.tradingName}
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    tradingName: event.target.value
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
               <Autocomplete
                 fullWidth
+                sx={{ marginTop: 2 }}
                 size='small'
                 options={citySearchResults}
                 getOptionLabel={option => `${option.name} - ${option.ufCode}`}
@@ -189,7 +289,17 @@ export default function EditCarHunter () {
                 )}
               />
               <FormControlLabel
-                control={<Checkbox checked={carHunterData.active || false} />}
+                control={
+                  <Checkbox
+                    checked={carHunterData.isActive || false}
+                    onChange={event =>
+                      setcarHunterData(prevData => ({
+                        ...prevData,
+                        isActive: event.target.checked
+                      }))
+                    }
+                  />
+                }
                 label='Usuário ativo'
               />
             </Grid>
@@ -209,6 +319,15 @@ export default function EditCarHunter () {
                   carHunterData.socialMedia &&
                   carHunterData.socialMedia.facebookUrl
                 }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    socialMedia: {
+                      ...prevData.socialMedia,
+                      facebookUrl: event.target.value
+                    }
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -220,6 +339,15 @@ export default function EditCarHunter () {
                 value={
                   carHunterData.socialMedia &&
                   carHunterData.socialMedia.instagramUrl
+                }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    socialMedia: {
+                      ...prevData.socialMedia,
+                      instagramUrl: event.target.value
+                    }
+                  }))
                 }
                 InputLabelProps={{ shrink: true }}
               />
@@ -233,21 +361,27 @@ export default function EditCarHunter () {
             {/* Inicio inputs dos telefones */}
             {phones.map((phone, index) => (
               <Grid item xs key={index}>
-                <TextField
-                  fullWidth
-                  label={`Telefone ${index + 1}`}
-                  margin='normal'
-                  variant='outlined'
-                  value={
-                    phone.areaCode && phone.number
-                      ? `${phone.areaCode} ${phone.number}`
-                      : ''
-                  }
-                />
+                <InputLabel htmlFor={`phone-${index}`}>{`Telefone ${
+                  index + 1
+                }`}</InputLabel>
+                <ReactInputMask
+                  mask='(99) 99999-9999'
+                  value={formatPhoneNumber(phone.areaCode, phone.number)}
+                  onChange={event => handlePhoneChange(event, index)}
+                >
+                  {inputProps => (
+                    <TextField
+                      {...inputProps}
+                      fullWidth
+                      margin='normal'
+                      id={`phone-${index}`}
+                    />
+                  )}
+                </ReactInputMask>
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={phone.whatsapp || false}
+                      checked={phone.isWhatsapp || false}
                       onChange={event => handleWhatsAppChange(event, index)}
                     />
                   }
@@ -272,6 +406,15 @@ export default function EditCarHunter () {
                   carHunterData.serviceRange &&
                   carHunterData.serviceRange.searchRadius
                 }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceRange: {
+                      ...prevData.serviceRange,
+                      searchRadius: event.target.value
+                    }
+                  }))
+                }
                 endAdornment={
                   <InputAdornment position='end'>km</InputAdornment>
                 }
@@ -287,6 +430,15 @@ export default function EditCarHunter () {
                   carHunterData.serviceRange &&
                   carHunterData.serviceRange.yearMin
                 }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceRange: {
+                      ...prevData.serviceRange,
+                      yearMin: event.target.value
+                    }
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -299,6 +451,19 @@ export default function EditCarHunter () {
                   carHunterData.serviceRange &&
                   carHunterData.serviceRange.yearMax
                 }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceRange: {
+                      ...prevData.serviceRange,
+                      yearMax: event.target.value
+                    }
+                  }))
+                }
+                disabled={
+                  carHunterData.serviceRange &&
+                  carHunterData.serviceRange.brandNew
+                }
                 InputLabelProps={{ shrink: true }}
               />
               <FormControlLabel
@@ -309,6 +474,18 @@ export default function EditCarHunter () {
                         carHunterData.serviceRange.brandNew) ||
                       false
                     }
+                    onChange={event => {
+                      setcarHunterData(prevData => ({
+                        ...prevData,
+                        serviceRange: {
+                          ...prevData.serviceRange,
+                          brandNew: event.target.checked,
+                          yearMax: event.target.checked
+                            ? ''
+                            : prevData.serviceRange.yearMax
+                        }
+                      }))
+                    }}
                   />
                 }
                 label='0km'
@@ -323,6 +500,15 @@ export default function EditCarHunter () {
                   carHunterData.serviceRange &&
                   carHunterData.serviceRange.priceMin
                 }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceRange: {
+                      ...prevData.serviceRange,
+                      priceMin: event.target.value
+                    }
+                  }))
+                }
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -334,6 +520,15 @@ export default function EditCarHunter () {
                 value={
                   carHunterData.serviceRange &&
                   carHunterData.serviceRange.priceMax
+                }
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceRange: {
+                      ...prevData.serviceRange,
+                      priceMax: event.target.value
+                    }
+                  }))
                 }
                 InputLabelProps={{ shrink: true }}
               />
@@ -353,11 +548,19 @@ export default function EditCarHunter () {
                 rows={10}
                 InputLabelProps={{ shrink: true }}
                 value={carHunterData.serviceDescription}
+                onChange={event =>
+                  setcarHunterData(prevData => ({
+                    ...prevData,
+                    serviceDescription: event.target.value
+                  }))
+                }
               />
             </Grid>
           </Grid>
           <Grid item xs alignItems={'end'}>
-            <Button variant='contained'>Save</Button>
+            <Button variant='contained' onClick={handleSave}>
+              Salvar
+            </Button>
           </Grid>
         </Box>
       </Box>
