@@ -10,18 +10,21 @@ import Image from 'next/image'
 import React from 'react'
 import logoImage from '/public/images/logo.png'
 import backgroundImage from '/public/images/index-background.png'
-import Head from 'next/head'
+import { useRouter } from 'next/router'
+import PageTitle from '../components/PageTitle'
 
 export default function HomePage () {
   const theme = useTheme()
+  const router = useRouter()
+
+  const handleSignUpClick = () => {
+    router.push('/car-hunter/signup')
+  }
 
   return (
     <Box sx={{ height: '100vh', display: 'flex' }}>
-      <Head>
-        <title>Consulta pra mim</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
-      
+      <PageTitle label='Consulta pra mim' />
+
       <Box sx={{ flex: 1, position: 'relative' }}>
         <Image
           src={backgroundImage}
@@ -82,7 +85,7 @@ export default function HomePage () {
             variant='h6'
             align='center'
             sx={{ fontWeight: 'light', fontSize: 15, cursor: 'pointer' }}
-            onClick={() => {}}
+            onClick={handleSignUpClick}
           >
             Tornar-se um Consultor
           </Typography>
