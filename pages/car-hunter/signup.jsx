@@ -1,27 +1,25 @@
-import {
-  Box,
-  TextField,
-  Typography,
-  TextareaAutosize,
-  Button,
-  Paper,
-  FormControl,
-  Grid
-} from '@mui/material'
+import { Box, TextField, Typography, Button, Paper, Grid } from '@mui/material'
 
 import Image from 'next/image'
 
 import registerBackground from '/public/images/register-background.png'
 import logoImage from '/public/images/logo.png'
-import Head from 'next/head'
+import { useRouter } from 'next/router'
+import PageTitle from '../../components/PageTitle'
+import CityInput from '../../components/CityInput'
+import { useState } from 'react'
 
 export default function CarHunterRegistrationPage () {
+  const router = useRouter()
+  const [selectedCity, setSelectedCity] = useState(null)
+
+  const handleImageClick = () => {
+    router.push('/')
+  }
+
   return (
     <Paper sx={{ display: 'flex' }}>
-      <Head>
-        <title>Registro de Consultores</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+      <PageTitle label='Torne-se um Consultor' />
 
       <Box
         sx={{
@@ -29,19 +27,25 @@ export default function CarHunterRegistrationPage () {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '80vh'
+          height: '90vh'
         }}
       >
         <Box
-          width={550}
-          height={400}
+          width={650}
+          height={500}
           sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
           }}
         >
-          <Box sx={{ marginBottom: 2 }} position='absolute' top={0} left={0}>
+          <Box
+            sx={{ marginBottom: 2, cursor: 'pointer' }}
+            position='absolute'
+            top={0}
+            left={0}
+            onClick={handleImageClick}
+          >
             <Image src={logoImage} width={230} height={95} />
           </Box>
           <Grid
@@ -52,7 +56,7 @@ export default function CarHunterRegistrationPage () {
             borderColor={'#e37d7d'}
             sx={{ backgroundColor: '#2F2F2F' }}
           >
-            <Grid item xs={12}>
+            <Grid item xs>
               <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
                 Torne-se um consultor
               </Typography>
@@ -63,53 +67,31 @@ export default function CarHunterRegistrationPage () {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Name'
-                margin='normal'
-                variant='outlined'
-              />
+              <TextField fullWidth label='Nome' margin='normal' />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Consultant Name'
-                margin='normal'
-                variant='outlined'
-              />
+              <TextField fullWidth label='Nome fantasia' margin='normal' />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <TextField
-                fullWidth
-                label='Consultant Name'
-                margin='normal'
-                variant='outlined'
+              <TextField fullWidth label='Email' margin='normal' />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <CityInput
+                size='normal'
+                selectedCity={selectedCity}
+                setSelectedCity={setSelectedCity}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='Name'
-                margin='normal'
-                variant='outlined'
-              />
+              <TextField fullWidth label='Telefone' margin='normal' />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs>
               <TextField
                 fullWidth
-                label='Consultant Name'
+                label='Descrição do serviço'
                 margin='normal'
-                variant='outlined'
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label='Service Description'
-                margin='normal'
-                variant='outlined'
                 multiline
-                rows={4}
+                rows={6}
               />
               <Button variant='contained' sx={{ mt: 1 }} fullWidth>
                 Save

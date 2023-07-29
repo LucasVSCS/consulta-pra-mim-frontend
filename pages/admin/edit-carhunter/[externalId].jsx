@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Avatar,
   Box,
   Button,
@@ -20,6 +19,7 @@ import Head from 'next/head'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 import ReactInputMask from 'react-input-mask'
+import CityInput from '../../../components/CityInput'
 
 export default function EditCarHunter () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -29,8 +29,6 @@ export default function EditCarHunter () {
   const [profilePicture, setProfilePicture] = useState(null)
   const [phones, setPhones] = useState([{}, {}])
   const [phone, setPhone] = useState('')
-
-  const [citySearchResults, setCitySearchResults] = useState([])
   const [selectedCity, setSelectedCity] = useState(null)
 
   useEffect(() => {
@@ -42,17 +40,6 @@ export default function EditCarHunter () {
       })
     }
   }, [carHunterData.city])
-
-  const handleCitySearch = async event => {
-    const value = event.target.value
-    if (value.length >= 3) {
-      const response = await fetch(`${apiUrl}/cities/get-by-name?name=${value}`)
-      const data = await response.json()
-      setCitySearchResults(data)
-    } else {
-      setCitySearchResults([])
-    }
-  }
 
   useEffect(() => {
     setProfilePicture(carHunterData.logoUrl)
@@ -270,23 +257,9 @@ export default function EditCarHunter () {
                 }
                 InputLabelProps={{ shrink: true }}
               />
-              <Autocomplete
-                fullWidth
-                sx={{ marginTop: 2 }}
-                size='small'
-                options={citySearchResults}
-                getOptionLabel={option => `${option.name} - ${option.ufCode}`}
-                value={selectedCity}
-                onChange={(event, newValue) => {
-                  setSelectedCity(newValue)
-                }}
-                renderInput={params => (
-                  <TextField
-                    {...params}
-                    label='Cidade'
-                    onChange={handleCitySearch}
-                  />
-                )}
+              <CityInput
+                selectedCity={selectedCity}
+                setSelectedCity={setSelectedCity}
               />
               <FormControlLabel
                 control={
