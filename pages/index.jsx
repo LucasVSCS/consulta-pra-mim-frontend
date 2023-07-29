@@ -16,6 +16,12 @@ export default function HomePage () {
     router.push('/car-hunter/signup')
   }
 
+  const handleSearchClick = () => {
+    if (selectedCity) {
+      router.push(`/car-hunter?cityId=${selectedCity.id}`)
+    }
+  }
+
   return (
     <Box sx={{ height: '100vh', display: 'flex' }}>
       <PageTitle label='Consulta pra mim' />
@@ -72,6 +78,7 @@ export default function HomePage () {
                 margin: 2,
                 width: '15vh'
               }}
+              onClick={handleSearchClick}
             >
               Pesquisar
             </Button>
