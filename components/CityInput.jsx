@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 
 export default function CityInput ({
   size = 'small',
+  label = 'Cidade',
   selectedCity,
-  setSelectedCity
+  setSelectedCity,
+  sx
 }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const [citySearchResults, setCitySearchResults] = useState([])
@@ -30,7 +32,7 @@ export default function CityInput ({
   return (
     <Autocomplete
       fullWidth
-      sx={{ marginTop: 2 }}
+      sx={sx}
       size={size}
       options={citySearchResults}
       getOptionLabel={option => `${option.name} - ${option.ufCode}`}
@@ -40,7 +42,7 @@ export default function CityInput ({
         setSelectedCity(newValue)
       }}
       renderInput={params => (
-        <TextField {...params} label='Cidade' onChange={handleCitySearch} />
+        <TextField {...params} label={label} onChange={handleCitySearch} />
       )}
     />
   )

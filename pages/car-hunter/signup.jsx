@@ -151,6 +151,7 @@ export default function CarHunterRegistrationPage () {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <CityInput
+                  sx={{ marginTop: 2 }}
                   size='normal'
                   selectedCity={selectedCity}
                   setSelectedCity={setSelectedCity}

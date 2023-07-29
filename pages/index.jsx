@@ -1,21 +1,16 @@
-import {
-  Box,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-  useTheme
-} from '@mui/material'
+import { Box, Button, Paper, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
-import React from 'react'
+import React, { useState } from 'react'
 import logoImage from '/public/images/logo.png'
 import backgroundImage from '/public/images/index-background.png'
 import { useRouter } from 'next/router'
 import PageTitle from '../components/PageTitle'
+import CityInput from '../components/CityInput'
 
 export default function HomePage () {
   const theme = useTheme()
   const router = useRouter()
+  const [selectedCity, setSelectedCity] = useState(null)
 
   const handleSignUpClick = () => {
     router.push('/car-hunter/signup')
@@ -64,11 +59,11 @@ export default function HomePage () {
               alignItems: 'center'
             }}
           >
-            <TextField
-              size='small'
+            <CityInput
               sx={{ width: '55%' }}
               label='Onde deseja encontrar seu consultor?'
-              variant='outlined'
+              selectedCity={selectedCity}
+              setSelectedCity={setSelectedCity}
             />
             <Button
               variant='contained'

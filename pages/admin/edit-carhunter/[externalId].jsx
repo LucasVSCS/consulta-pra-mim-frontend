@@ -258,6 +258,7 @@ export default function EditCarHunter () {
                 InputLabelProps={{ shrink: true }}
               />
               <CityInput
+                sx={{ marginTop: 2 }}
                 selectedCity={selectedCity}
                 setSelectedCity={setSelectedCity}
               />
