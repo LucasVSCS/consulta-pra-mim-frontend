@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from 'react'
-import MUIDataTable from 'mui-datatables'
-import { useRouter } from 'next/router'
 import {
   Autocomplete,
   Button,
@@ -11,6 +8,9 @@ import {
   Select,
   TextField
 } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import MUIDataTable from 'mui-datatables'
+import { useRouter } from 'next/router'
 
 export default function DashboardTable ({ fetchData }) {
   const router = useRouter()
@@ -67,7 +67,7 @@ export default function DashboardTable ({ fetchData }) {
     page: page,
     filter: false,
     selectableRows: 'none',
-    disableToolbarSelect: true,
+    selectToolbarPlacement: 'none',
     rowsPerPageOptions: [5, 10, 25, 50, 100],
     search: false,
     viewColumns: false,
@@ -122,7 +122,7 @@ export default function DashboardTable ({ fetchData }) {
       }
     },
     {
-      name: 'active',
+      name: 'isActive',
       label: 'Status',
       options: {
         sort: false,

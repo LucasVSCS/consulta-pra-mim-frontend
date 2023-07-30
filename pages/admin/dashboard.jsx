@@ -3,7 +3,7 @@ import { parseCookies } from 'nookies'
 
 import Header from '../../components/Header'
 import DashBoardTable from '../../components/DashboardTable'
-import Head from 'next/head'
+import PageTitle from '../../components/PageTitle'
 
 export default function Dashboard () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -31,10 +31,7 @@ export default function Dashboard () {
 
   return (
     <Paper sx={{ height: '100vh' }}>
-      <Head>
-        <title>Painel Principal - Dashboard</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+      <PageTitle label={'Painel Principal - Dashboard'} />
       <Header title={'Painel Principal - Dashboard'} />
 
       <Container>
