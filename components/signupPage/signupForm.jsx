@@ -10,6 +10,7 @@ import BackButton from '../BackButton'
 import CityInput from '../CityInput'
 import { useState } from 'react'
 import { useSnackbar } from 'notistack'
+import { PatternFormat } from 'react-number-format'
 
 export default function SignupForm () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -34,9 +35,9 @@ export default function SignupForm () {
       serviceDescription,
       phones: [
         {
-          areaCode: phone.slice(0, 2),
-          number: phone.slice(2),
-          isWhatsapp: true
+          areaCode: phone.replace(/[^0-9]/g, '').slice(0, 2),
+          number: phone.replace(/[^0-9]/g, '').slice(2),
+          isWhatsapp: isWhatsapp
         }
       ]
     }
@@ -130,7 +131,9 @@ export default function SignupForm () {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
+          <PatternFormat
+            customInput={TextField}
+            format='(##) #####-####'
             fullWidth
             label='Telefone'
             margin='normal'
