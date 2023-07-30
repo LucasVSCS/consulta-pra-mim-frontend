@@ -9,9 +9,11 @@ import {
 import BackButton from '../BackButton'
 import CityInput from '../CityInput'
 import { useState } from 'react'
+import { useSnackbar } from 'notistack'
 
 export default function SignupForm () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  const { enqueueSnackbar } = useSnackbar()
 
   const [name, setName] = useState('')
   const [tradingName, setTradingName] = useState('')
@@ -49,12 +51,26 @@ export default function SignupForm () {
       })
 
       if (response.ok) {
-        // Trate a resposta bem-sucedida aqui
+        setName('')
+        setTradingName('')
+        setEmail('')
+        setSelectedCity(null)
+        setPhone('')
+        setIsWhatsapp(false)
+        setServiceDescription('')
+
+        enqueueSnackbar('Cadastro solicitado com sucesso!', {
+          variant: 'success'
+        })
       } else {
-        // Trate a resposta com erro aqui
+        enqueueSnackbar('Ocorreu um erro ao solicitar o cadastro', {
+          variant: 'error'
+        })
       }
     } catch (error) {
-      // Trate o erro de rede aqui
+      enqueueSnackbar('Ocorreu um erro ao solicitar o cadastro', {
+        variant: 'error'
+      })
     }
   }
 
