@@ -1,12 +1,12 @@
 import { Box, Paper } from '@mui/material'
-
-import Image from 'next/image'
-
-import registerBackground from '/public/images/register-background.png'
 import { useRouter } from 'next/router'
+
 import PageTitle from '../../components/PageTitle'
 import LogoImage from '../../components/LogoImage'
 import SignupForm from '../../components/signupPage/signupForm'
+import BackgroundImage from '../../components/BackgroundImage'
+
+import registerBackground from '/public/images/register-background.png'
 
 export default function CarHunterRegistrationPage () {
   const router = useRouter()
@@ -19,6 +19,12 @@ export default function CarHunterRegistrationPage () {
     mb: 2,
     width: 250,
     height: 100
+  }
+
+  const propsBackgrounImage = {
+    flexBasis: { xs: '100%', md: '50%' },
+    position: 'relative',
+    height: '100vh'
   }
 
   const handleImageClick = () => {
@@ -51,16 +57,7 @@ export default function CarHunterRegistrationPage () {
           <SignupForm />
         </Box>
       </Box>
-
-      <Box
-        sx={{
-          flexBasis: { xs: '100%', md: '50%' },
-          position: 'relative',
-          height: '100vh'
-        }}
-      >
-        <Image src={registerBackground} layout='fill' objectFit='cover' />
-      </Box>
+      <BackgroundImage image={registerBackground} sx={propsBackgrounImage} />
     </Paper>
   )
 }

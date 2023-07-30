@@ -1,21 +1,26 @@
 import { Box, Button, Paper, Typography, useTheme } from '@mui/material'
-import Image from 'next/image'
-import React, { useState } from 'react'
-import backgroundImage from '/public/images/index-background.png'
 import { useRouter } from 'next/router'
+import React, { useState } from 'react'
+
 import PageTitle from '../components/PageTitle'
 import CityInput from '../components/CityInput'
 import LogoImage from '../components/LogoImage'
+import BackgroundImage from '../components/BackgroundImage'
+
+import backgroundImage from '/public/images/index-background.png'
 
 export default function HomePage () {
   const theme = useTheme()
   const router = useRouter()
   const [selectedCity, setSelectedCity] = useState(null)
+
   const propsLogo = {
     mb: 2,
     width: 230,
     height: 100
   }
+
+  const propsBackgrounImage = { flex: 1, position: 'relative' }
 
   const handleSignUpClick = () => {
     router.push('/car-hunter/signup')
@@ -31,14 +36,8 @@ export default function HomePage () {
     <Box sx={{ height: '100vh', display: 'flex' }}>
       <PageTitle label='Consulta pra mim' />
 
-      <Box sx={{ flex: 1, position: 'relative' }}>
-        <Image
-          src={backgroundImage}
-          layout='fill'
-          objectFit='cover'
-          alt='Background Image'
-        />
-      </Box>
+      <BackgroundImage image={backgroundImage} sx={propsBackgrounImage} />
+
       <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Box
           border={2}

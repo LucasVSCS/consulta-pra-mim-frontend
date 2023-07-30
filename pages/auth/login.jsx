@@ -9,12 +9,13 @@ import {
 import { useState } from 'react'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
 
-import authBackground from '/public/images/auth-background.jpg'
 import PageTitle from '../../components/PageTitle'
 import LogoImage from '../../components/LogoImage'
+import BackgroundImage from '../../components/BackgroundImage'
+
 import { login } from '../../services/actions/authAction'
+import authBackground from '/public/images/auth-background.jpg'
 
 export default function LoginPage () {
   const [username, setUsername] = useState('')
@@ -25,6 +26,12 @@ export default function LoginPage () {
     width: 350,
     height: 150,
     marginBottom: 2
+  }
+
+  const propsBackgrounImage = {
+    flexBasis: { xs: '100%', md: '40%' },
+    position: 'relative',
+    height: '100vh'
   }
 
   const router = useRouter()
@@ -42,15 +49,7 @@ export default function LoginPage () {
     <Paper sx={{ display: 'flex' }}>
       <PageTitle label='Painel - Login' />
 
-      <Box
-        sx={{
-          flexBasis: { xs: '100%', md: '40%' },
-          position: 'relative',
-          height: '100vh'
-        }}
-      >
-        <Image src={authBackground} layout='fill' objectFit='cover' />
-      </Box>
+      <BackgroundImage image={authBackground} sx={propsBackgrounImage} />
 
       <Box
         sx={{
