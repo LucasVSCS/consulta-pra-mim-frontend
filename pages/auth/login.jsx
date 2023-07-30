@@ -21,6 +21,12 @@ export default function LoginPage () {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
+  const propsLogo = {
+    width: 350,
+    height: 150,
+    marginBottom: 2
+  }
+
   const router = useRouter()
 
   const handleLogin = async () => {
@@ -30,12 +36,6 @@ export default function LoginPage () {
     } else {
       setError(result.error)
     }
-  }
-
-  const propsLogo = {
-    width: 350,
-    height: 150,
-    marginBottom: 2
   }
 
   return (
@@ -70,7 +70,7 @@ export default function LoginPage () {
             alignItems: 'center'
           }}
         >
-          <LogoImage {...propsLogo} />
+          <LogoImage sx={propsLogo} />
           <Box border={2} borderColor={'#e37d7d'} width={550} height={400}>
             <FormControl
               sx={{

@@ -12,11 +12,11 @@ import {
 import Image from 'next/image'
 
 import registerBackground from '/public/images/register-background.png'
-import logoImage from '/public/images/logo.png'
 import { useRouter } from 'next/router'
 import PageTitle from '../../components/PageTitle'
 import CityInput from '../../components/CityInput'
 import { useState } from 'react'
+import LogoImage from '../../components/LogoImage'
 
 export default function CarHunterRegistrationPage () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -29,6 +29,16 @@ export default function CarHunterRegistrationPage () {
   const [phone, setPhone] = useState('')
   const [isWhatsapp, setIsWhatsapp] = useState(false)
   const [serviceDescription, setServiceDescription] = useState('')
+
+  const propsLogo = {
+    cursor: 'pointer',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    mb: 2,
+    width: 230,
+    height: 95
+  }
 
   const handleImageClick = () => {
     router.push('/')
@@ -93,15 +103,7 @@ export default function CarHunterRegistrationPage () {
             alignItems: 'center'
           }}
         >
-          <Box
-            sx={{ marginBottom: 2, cursor: 'pointer' }}
-            position='absolute'
-            top={0}
-            left={0}
-            onClick={handleImageClick}
-          >
-            <Image src={logoImage} width={230} height={95} />
-          </Box>
+          <LogoImage sx={propsLogo} onClick={handleImageClick} />
 
           <form onSubmit={handleSubmit}>
             <Grid
@@ -191,7 +193,7 @@ export default function CarHunterRegistrationPage () {
                   sx={{ mt: 1 }}
                   fullWidth
                 >
-                  Registrar-se
+                  Solicitar cadastro
                 </Button>
               </Grid>
             </Grid>

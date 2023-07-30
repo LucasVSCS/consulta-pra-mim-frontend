@@ -1,16 +1,21 @@
 import { Box, Button, Paper, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 import React, { useState } from 'react'
-import logoImage from '/public/images/logo.png'
 import backgroundImage from '/public/images/index-background.png'
 import { useRouter } from 'next/router'
 import PageTitle from '../components/PageTitle'
 import CityInput from '../components/CityInput'
+import LogoImage from '../components/LogoImage'
 
 export default function HomePage () {
   const theme = useTheme()
   const router = useRouter()
   const [selectedCity, setSelectedCity] = useState(null)
+  const propsLogo = {
+    mb: 2,
+    width: 230,
+    height: 100
+  }
 
   const handleSignUpClick = () => {
     router.push('/car-hunter/signup')
@@ -51,9 +56,7 @@ export default function HomePage () {
             flexDirection: 'column'
           }}
         >
-          <Box marginBottom={2}>
-            <Image src={logoImage} width={230} height={100} />
-          </Box>
+          <LogoImage sx={propsLogo} />
           <Typography variant='h6' align='center' sx={{ fontWeight: 'bold' }}>
             A melhor disponibilidade de Car Hunters perto de você
           </Typography>

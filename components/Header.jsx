@@ -9,15 +9,20 @@ import {
   Typography
 } from '@mui/material'
 
-import Image from 'next/image'
 import { AccountCircle } from '@mui/icons-material'
 import React from 'react'
 import { useRouter } from 'next/router'
-import logoImage from '/public/images/logo.png'
+import LogoImage from './LogoImage'
 
 export default function Header ({ title }) {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const router = useRouter()
+
+  const propsLogo = {
+    cursor: 'pointer',
+    width: 130,
+    height: 50
+  }
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget)
@@ -36,9 +41,7 @@ export default function Header ({ title }) {
       <AppBar position='static'>
         <Container maxWidth='xl'>
           <Toolbar>
-            <Box sx={{ cursor: 'pointer' }} onClick={handleImageClick}>
-              <Image src={logoImage} width={130} height={50} />
-            </Box>
+            <LogoImage sx={propsLogo} onClick={handleImageClick} />
             <Typography variant='h6' sx={{ flexGrow: 1, ml: 2 }}>
               {title}
             </Typography>
