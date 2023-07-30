@@ -1,9 +1,8 @@
-import { Box, Paper } from '@mui/material'
+import { Container, Paper } from '@mui/material'
 import { parseCookies } from 'nookies'
 
 import Header from '../../components/Header'
 import DashBoardTable from '../../components/DashboardTable'
-import DataBox from '../../components/DataBox'
 import Head from 'next/head'
 
 export default function Dashboard () {
@@ -38,26 +37,9 @@ export default function Dashboard () {
       </Head>
       <Header title={'Painel Principal - Dashboard'} />
 
-      <Box display='flex'>
-        <Box
-          display='flex'
-          flexDirection='column'
-          alignItems='center'
-          width='20%'
-        >
-          <DataBox value={'574'} label={'Consultores ativos'} />
-
-          <DataBox
-            value={'574'}
-            label={'Consultores pendentes de aprovação'}
-            marginTop={25}
-          />
-        </Box>
-
-        <Box width='70%'>
-          <DashBoardTable fetchData={fetchData} />
-        </Box>
-      </Box>
+      <Container>
+        <DashBoardTable fetchData={fetchData} />
+      </Container>
     </Paper>
   )
 }
