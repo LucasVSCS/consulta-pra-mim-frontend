@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 export default function CityInput ({
   size = 'small',
   label = 'Cidade',
+  variant = 'outlined',
   selectedCity,
   setSelectedCity,
   sx
@@ -42,7 +43,12 @@ export default function CityInput ({
         setSelectedCity(newValue)
       }}
       renderInput={params => (
-        <TextField {...params} label={label} onChange={handleCitySearch} />
+        <TextField
+          {...params}
+          label={label}
+          onChange={handleCitySearch}
+          variant={variant}
+        />
       )}
     />
   )

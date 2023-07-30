@@ -1,43 +1,51 @@
 import {
   Button,
   Checkbox,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
   Grid,
-  TextField,
+  Input,
+  InputLabel,
   Typography
 } from '@mui/material'
+import * as Yup from 'yup'
 import BackButton from '../BackButton'
 import CityInput from '../CityInput'
-import { useState } from 'react'
+
 import { useSnackbar } from 'notistack'
 import { PatternFormat } from 'react-number-format'
+import { Formik, Form, Field, ErrorMessage } from 'formik'
+
+const SignupSchema = Yup.object().shape({
+  name: Yup.string().required('Required'),
+  tradingName: Yup.string().required('Required'),
+  email: Yup.string().email('Invalid email').required('Required'),
+  selectedCity: Yup.object()
+    .shape({
+      id: Yup.string().required('Required')
+    })
+    .required('Required'),
+  phone: Yup.string().required('Required'),
+  serviceDescription: Yup.string().required('Required')
+})
 
 export default function SignupForm () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const { enqueueSnackbar } = useSnackbar()
 
-  const [name, setName] = useState('')
-  const [tradingName, setTradingName] = useState('')
-  const [email, setEmail] = useState('')
-  const [selectedCity, setSelectedCity] = useState(null)
-  const [phone, setPhone] = useState('')
-  const [isWhatsapp, setIsWhatsapp] = useState(false)
-  const [serviceDescription, setServiceDescription] = useState('')
-
-  const handleSubmit = async event => {
-    event.preventDefault()
-
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     const formData = {
-      name,
-      tradingName,
-      email,
-      cityId: selectedCity.id,
-      serviceDescription,
+      name: values.name,
+      tradingName: values.tradingName,
+      email: values.email,
+      serviceDescription: values.serviceDescription,
+      cityId: values.selectedCity.id,
       phones: [
         {
-          areaCode: phone.replace(/[^0-9]/g, '').slice(0, 2),
-          number: phone.replace(/[^0-9]/g, '').slice(2),
-          isWhatsapp: isWhatsapp
+          areaCode: values.phone.replace(/[^0-9]/g, '').slice(0, 2),
+          number: values.phone.replace(/[^0-9]/g, '').slice(2),
+          isWhatsapp: values.isWhatsapp
         }
       ]
     }
@@ -52,14 +60,7 @@ export default function SignupForm () {
       })
 
       if (response.ok) {
-        setName('')
-        setTradingName('')
-        setEmail('')
-        setSelectedCity(null)
-        setPhone('')
-        setIsWhatsapp(false)
-        setServiceDescription('')
-
+        resetForm()
         enqueueSnackbar('Cadastro solicitado com sucesso!', {
           variant: 'success'
         })
@@ -73,98 +74,166 @@ export default function SignupForm () {
         variant: 'error'
       })
     }
+
+    setSubmitting(false)
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <BackButton sx={{ mb: 2 }} />
-      <Grid
-        container
-        spacing={0.7}
-        padding={3}
-        border={1}
-        sx={{ backgroundColor: '#2F2F2F' }}
-      >
-        <Grid item xs>
-          <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
-            Torne-se um consultor
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant='h6' sx={{ fontSize: 16 }}>
-            Solicite seu cadastro na plataforma mediante os dados abaixo
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label='Nome'
-            margin='normal'
-            value={name}
-            onChange={event => setName(event.target.value)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label='Nome fantasia'
-            margin='normal'
-            value={tradingName}
-            onChange={event => setTradingName(event.target.value)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={12}>
-          <TextField
-            fullWidth
-            label='Email'
-            margin='normal'
-            value={email}
-            onChange={event => setEmail(event.target.value)}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <CityInput
-            sx={{ marginTop: 2 }}
-            size='normal'
-            selectedCity={selectedCity}
-            setSelectedCity={setSelectedCity}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <PatternFormat
-            customInput={TextField}
-            format='(##) #####-####'
-            fullWidth
-            label='Telefone'
-            margin='normal'
-            value={phone}
-            onChange={event => setPhone(event.target.value)}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isWhatsapp}
-                onChange={event => setIsWhatsapp(event.target.checked)}
-              />
-            }
-            label='É Whastapp'
-          />
-        </Grid>
-        <Grid item xs>
-          <TextField
-            fullWidth
-            label='Descrição do serviço'
-            margin='normal'
-            multiline
-            rows={6}
-            value={serviceDescription}
-            onChange={event => setServiceDescription(event.target.value)}
-          />
-          <Button type='submit' variant='contained' sx={{ mt: 1 }} fullWidth>
-            Solicitar cadastro
-          </Button>
-        </Grid>
-      </Grid>
-    </form>
+    <Formik
+      initialValues={{
+        name: '',
+        tradingName: '',
+        email: '',
+        selectedCity: null,
+        phone: '',
+        isWhatsapp: false,
+        serviceDescription: ''
+      }}
+      validationSchema={SignupSchema}
+      onSubmit={handleSubmit}
+    >
+      {({ isSubmitting }) => (
+        <Form>
+          <BackButton sx={{ mb: 2 }} />
+          <Grid
+            container
+            spacing={0.7}
+            padding={3}
+            border={1}
+            sx={{ backgroundColor: '#2F2F2F' }}
+          >
+            <Grid item xs>
+              <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
+                Torne-se um consultor
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant='h6' sx={{ fontSize: 16 }}>
+                Solicite seu cadastro na plataforma mediante os dados abaixo
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Field name='name'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <InputLabel htmlFor='name'>Nome</InputLabel>
+                    <Input {...field} id='name' />
+                    <FormHelperText error>
+                      {form.touched.name && form.errors.name}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Field name='tradingName'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <InputLabel htmlFor='tradingName'>Nome fantasia</InputLabel>
+                    <Input {...field} id='tradingName' />
+                    <FormHelperText error>
+                      {form.touched.tradingName && form.errors.tradingName}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <Field name='email'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <InputLabel htmlFor='email'>Email</InputLabel>
+                    <Input {...field} id='email' type='email' />
+                    <FormHelperText error>
+                      {form.touched.email && form.errors.email}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Field name='selectedCity'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <CityInput
+                      {...field}
+                      sx={{ mt: 0.4 }}
+                      variant='standard'
+                      setSelectedCity={value =>
+                        form.setFieldValue(field.name, value)
+                      }
+                    />
+                    <FormHelperText error>
+                      {form.touched.selectedCity && form.errors.selectedCity}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Field name='phone'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <InputLabel htmlFor='phone'>Telefone</InputLabel>
+                    <PatternFormat
+                      {...field}
+                      customInput={Input}
+                      format='(##) #####-####'
+                      id='phone'
+                    />
+                    <FormHelperText error>
+                      {form.touched.phone && form.errors.phone}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name='isWhatsapp'>
+                {({ field }) => (
+                  <>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          {...field}
+                          checked={field.value}
+                          onChange={() =>
+                            form.setFieldValue(field.name, !field.value)
+                          }
+                        />
+                      }
+                      label='É Whastapp'
+                    />
+                    <ErrorMessage name='isWhatsapp' />
+                  </>
+                )}
+              </Field>
+            </Grid>
+            <Grid item xs>
+              <Field name='serviceDescription'>
+                {({ field, form }) => (
+                  <FormControl fullWidth margin='normal'>
+                    <InputLabel htmlFor='serviceDescription'>
+                      Descrição do serviço
+                    </InputLabel>
+                    <Input rows={6} {...field} id='serviceDescription' />
+                    <FormHelperText error>
+                      {form.touched.serviceDescription &&
+                        form.errors.serviceDescription}
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </Field>
+            </Grid>
+            <Button
+              variant='contained'
+              type='submit'
+              fullWidth
+              disabled={isSubmitting}
+            >
+              Solicitar cadastro
+            </Button>
+          </Grid>
+        </Form>
+      )}
+    </Formik>
   )
 }
