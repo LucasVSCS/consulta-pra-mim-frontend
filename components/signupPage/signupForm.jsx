@@ -10,12 +10,14 @@ import {
   Typography
 } from '@mui/material'
 import * as Yup from 'yup'
+
 import BackButton from '../BackButton'
 import CityInput from '../CityInput'
 
-import { useSnackbar } from 'notistack'
 import { PatternFormat } from 'react-number-format'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
+import { useSnackbar } from 'notistack'
+import { signupCarhunter } from '../../services/actions/signupCarhunter'
 
 const SignupSchema = Yup.object().shape({
   name: Yup.string().required('Required'),
@@ -31,51 +33,10 @@ const SignupSchema = Yup.object().shape({
 })
 
 export default function SignupForm () {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const { enqueueSnackbar } = useSnackbar()
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    const formData = {
-      name: values.name,
-      tradingName: values.tradingName,
-      email: values.email,
-      serviceDescription: values.serviceDescription,
-      cityId: values.selectedCity.id,
-      phones: [
-        {
-          areaCode: values.phone.replace(/[^0-9]/g, '').slice(0, 2),
-          number: values.phone.replace(/[^0-9]/g, '').slice(2),
-          isWhatsapp: values.isWhatsapp
-        }
-      ]
-    }
-
-    try {
-      const response = await fetch(`${apiUrl}/car-hunters`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (response.ok) {
-        resetForm()
-        enqueueSnackbar('Cadastro solicitado com sucesso!', {
-          variant: 'success'
-        })
-      } else {
-        enqueueSnackbar('Ocorreu um erro ao solicitar o cadastro', {
-          variant: 'error'
-        })
-      }
-    } catch (error) {
-      enqueueSnackbar('Ocorreu um erro ao solicitar o cadastro', {
-        variant: 'error'
-      })
-    }
-
-    setSubmitting(false)
+  const handleSubmit = async (values, formikHelpers) => {
+    await signupCarhunter(values, formikHelpers, enqueueSnackbar)
   }
 
   return (
@@ -156,11 +117,10 @@ export default function SignupForm () {
                 {({ field, form }) => (
                   <FormControl fullWidth margin='normal'>
                     <CityInput
-                      {...field}
-                      sx={{ mt: 0.4 }}
                       variant='standard'
-                      setSelectedCity={value =>
-                        form.setFieldValue(field.name, value)
+                      {...field}
+                      onChange={(event, newValue) =>
+                        form.setFieldValue(field.name, newValue)
                       }
                     />
                     <FormHelperText error>

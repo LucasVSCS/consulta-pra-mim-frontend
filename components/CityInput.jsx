@@ -1,23 +1,16 @@
+import { useState } from 'react'
 import { Autocomplete, TextField } from '@mui/material'
-import { useEffect, useState } from 'react'
 
 export default function CityInput ({
   size = 'small',
   label = 'Cidade',
   variant = 'outlined',
-  selectedCity,
-  setSelectedCity,
+  value,
+  onChange,
   sx
 }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const [citySearchResults, setCitySearchResults] = useState([])
-  const [internalSelectedCity, setInternalSelectedCity] = useState(selectedCity)
-
-  useEffect(() => {
-    console.log(selectedCity)
-    setInternalSelectedCity(selectedCity)
-    console.log(internalSelectedCity)
-  }, [selectedCity])
 
   const handleCitySearch = async event => {
     const value = event.target.value
@@ -37,11 +30,8 @@ export default function CityInput ({
       size={size}
       options={citySearchResults}
       getOptionLabel={option => `${option.name} - ${option.ufCode}`}
-      value={internalSelectedCity}
-      onChange={(event, newValue) => {
-        setInternalSelectedCity(newValue)
-        setSelectedCity(newValue)
-      }}
+      value={value || null}
+      onChange={onChange}
       renderInput={params => (
         <TextField
           {...params}
