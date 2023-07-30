@@ -148,7 +148,7 @@ export default function SignupForm () {
                 )}
               </Field>
               <Field name='isWhatsapp'>
-                {({ field }) => (
+                {({ field, form }) => (
                   <>
                     <FormControlLabel
                       control={
