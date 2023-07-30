@@ -9,18 +9,20 @@ import {
 import { useState } from 'react'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
+import { useSnackbar } from 'notistack'
 
+import BackgroundImage from '../../components/BackgroundImage'
 import PageTitle from '../../components/PageTitle'
 import LogoImage from '../../components/LogoImage'
-import BackgroundImage from '../../components/BackgroundImage'
 
-import { login } from '../../services/actions/authAction'
 import authBackground from '/public/images/auth-background.jpg'
+import { login } from '../../services/actions/authAction'
 
 export default function LoginPage () {
+  const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
 
   const propsLogo = {
     width: 350,
@@ -34,15 +36,20 @@ export default function LoginPage () {
     height: '100vh'
   }
 
-  const router = useRouter()
-
   const handleLogin = async () => {
     const result = await login(username, password)
+
     if (result.success) {
-      router.push('/admin/dashboard')
-    } else {
-      setError(result.error)
+      return router.push('/admin/dashboard')
     }
+
+    enqueueSnackbar('Credenciais inválidas', {
+      variant: 'error',
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'center'
+      }
+    })
   }
 
   return (
@@ -70,7 +77,12 @@ export default function LoginPage () {
           }}
         >
           <LogoImage sx={propsLogo} />
-          <Box border={2} borderColor={'#e37d7d'} width={550} height={400}>
+          <Box
+            sx={{ backgroundColor: 'background.paper' }}
+            border={1}
+            width={550}
+            height={400}
+          >
             <FormControl
               sx={{
                 display: 'flex',
@@ -82,28 +94,26 @@ export default function LoginPage () {
                 Digite suas credenciais
               </Typography>
 
-              <TextField
-                label='Nome de usuário'
-                margin='normal'
-                size='small'
-                value={username}
-                onChange={event => setUsername(event.target.value)}
-                sx={{
-                  width: '35vh'
-                }}
-              />
+              <Box sx={{ width: '35vh' }}>
+                <TextField
+                  fullWidth
+                  label='Nome de usuário'
+                  margin='normal'
+                  size='small'
+                  value={username}
+                  onChange={event => setUsername(event.target.value)}
+                />
 
-              <TextField
-                label='Senha'
-                type='password'
-                margin='normal'
-                size='small'
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                sx={{
-                  width: '35vh'
-                }}
-              />
+                <TextField
+                  fullWidth
+                  label='Senha'
+                  type='password'
+                  margin='normal'
+                  size='small'
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                />
+              </Box>
 
               <Button
                 variant='contained'
