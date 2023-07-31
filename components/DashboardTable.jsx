@@ -1,33 +1,20 @@
-import {
-  Autocomplete,
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField
-} from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
 import { useRouter } from 'next/router'
+import DashboardSearchFilter from './DashboardSearchFilter'
 
 export default function DashboardTable ({ fetchData }) {
   const router = useRouter()
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const [data, setData] = useState([])
+
+  // Pagination and Sorting States
   const [page, setPage] = useState(0)
   const [count, setCount] = useState(0)
   const [sort, setSort] = useState('name')
   const [order, setOrder] = useState('asc')
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [citySearchResults, setCitySearchResults] = useState([])
 
-  const [status, setStatus] = useState('')
-  const [cityId, setCityId] = useState('')
-  const [name, setName] = useState('')
-  const [tradingName, setTradingName] = useState('')
-  const [appliedFilters, setAppliedFilters] = useState({
+  const [filters, setFilters] = useState({
     status: '',
     cityId: '',
     name: '',
@@ -40,10 +27,10 @@ export default function DashboardTable ({ fetchData }) {
       sort,
       order,
       rowsPerPage,
-      appliedFilters.status,
-      appliedFilters.cityId,
-      appliedFilters.name,
-      appliedFilters.tradingName
+      filters.status,
+      filters.cityId,
+      filters.name,
+      filters.tradingName
     ).then(result => {
       setData(result.data)
       setCount(result.total)
@@ -54,11 +41,29 @@ export default function DashboardTable ({ fetchData }) {
     sort,
     order,
     rowsPerPage,
-    appliedFilters.status,
-    appliedFilters.cityId,
-    appliedFilters.name,
-    appliedFilters.tradingName
+    filters.status,
+    filters.cityId,
+    filters.name,
+    filters.tradingName
   ])
+
+  const handleSearch = values => {
+    setFilters({
+      status: values.status,
+      cityId: values.selectedCity?.id ?? '',
+      name: values.name,
+      tradingName: values.tradingName
+    })
+  }
+
+  const handleClearFilters = () => {
+    setFilters({
+      status: '',
+      cityId: '',
+      name: '',
+      tradingName: ''
+    })
+  }
 
   const options = {
     filterType: 'checkbox',
@@ -150,103 +155,13 @@ export default function DashboardTable ({ fetchData }) {
     }
   ]
 
-  const handleCitySearch = async event => {
-    const value = event.target.value
-    if (value.length >= 3) {
-      const response = await fetch(`${apiUrl}/cities/get-by-name?name=${value}`)
-      const data = await response.json()
-      setCitySearchResults(data)
-    } else {
-      setCitySearchResults([])
-    }
-  }
-
-  const handleSearch = () => {
-    setAppliedFilters({
-      status: status,
-      cityId: cityId,
-      name: name,
-      tradingName: tradingName
-    })
-  }
-
-  const handleClearFilters = () => {
-    setStatus('')
-    setCityId('')
-    setName('')
-    setTradingName('')
-    setAppliedFilters({
-      status: '',
-      cityId: '',
-      name: '',
-      tradingName: ''
-    })
-  }
-
   return (
     <>
-      <Grid container spacing={1} mb>
-        <Grid item xs>
-          <TextField
-            fullWidth
-            size='small'
-            label='Nome'
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs>
-          <TextField
-            fullWidth
-            size='small'
-            label='Nome Consultoria'
-            value={tradingName}
-            onChange={e => setTradingName(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs>
-          <Autocomplete
-            fullWidth
-            size='small'
-            options={citySearchResults}
-            getOptionLabel={option => `${option.name} - ${option.ufCode}`}
-            onChange={(event, newValue) => {
-              setCityId(newValue ? newValue.id : '')
-            }}
-            renderInput={params => (
-              <TextField
-                {...params}
-                label='Cidade'
-                onChange={handleCitySearch}
-              />
-            )}
-          />
-        </Grid>
-        <Grid item xs>
-          <FormControl size='small' fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={status}
-              onChange={e => setStatus(e.target.value)}
-              label='Status'
-            >
-              <MenuItem value=''>
-                <em>Todos</em>
-              </MenuItem>
-              <MenuItem value='1'>Ativo</MenuItem>
-              <MenuItem value='0'>Inativo</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item alignSelf={'center'}>
-          <Button variant='contained' fullWidth onClick={handleSearch}>
-            Pesquisar
-          </Button>
-        </Grid>
-        <Grid item alignSelf={'center'}>
-          <Button onClick={handleClearFilters}>Limpar Filtros</Button>
-        </Grid>
-      </Grid>
+      <DashboardSearchFilter
+        onSearch={handleSearch}
+        onClearFilters={handleClearFilters}
+      />
+
       <MUIDataTable
         title={'Lista de Consultores Cadastrados'}
         data={data}
