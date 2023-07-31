@@ -15,11 +15,12 @@ import {
 } from '@mui/material'
 import Header from '../../../components/Header'
 import { useEffect, useState } from 'react'
-import Head from 'next/head'
 import { parseCookies } from 'nookies'
 import { useRouter } from 'next/router'
 import ReactInputMask from 'react-input-mask'
 import CityInput from '../../../components/CityInput'
+import PageTitle from '../../../components/PageTitle'
+import { PatternFormat } from 'react-number-format'
 
 export default function EditCarHunter () {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -154,7 +155,6 @@ export default function EditCarHunter () {
         throw new Error(`An error occurred: ${response.statusText}`)
       }
       const responseData = await response.json()
-      console.log(responseData)
     } catch (error) {
       console.error(error)
     }
@@ -162,10 +162,7 @@ export default function EditCarHunter () {
 
   return (
     <Paper sx={{ height: '100vh' }}>
-      <Head>
-        <title>Edit Automotive Consultant</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+      <PageTitle label={'Editar Consultor Automotivo'} />
       <Header title={'Editar Consultor Automotivo'} />
 
       <Box display='flex' flexDirection='column' alignItems='center'>
@@ -175,8 +172,7 @@ export default function EditCarHunter () {
           sx={{
             backgroundColor: '#2F2F2F',
             padding: 2,
-            border: 2,
-            borderColor: '#f98989'
+            border: 1
           }}
         >
           <Grid container spacing={1}>
@@ -335,23 +331,14 @@ export default function EditCarHunter () {
             {/* Inicio inputs dos telefones */}
             {phones.map((phone, index) => (
               <Grid item xs key={index}>
-                <InputLabel htmlFor={`phone-${index}`}>{`Telefone ${
-                  index + 1
-                }`}</InputLabel>
-                <ReactInputMask
-                  mask='(99) 99999-9999'
+                <PatternFormat
+                  fullWidth
+                  size='small'
                   value={formatPhoneNumber(phone.areaCode, phone.number)}
-                  onChange={event => handlePhoneChange(event, index)}
-                >
-                  {inputProps => (
-                    <TextField
-                      {...inputProps}
-                      fullWidth
-                      margin='normal'
-                      id={`phone-${index}`}
-                    />
-                  )}
-                </ReactInputMask>
+                  customInput={TextField}
+                  format='(##) #####-####'
+                  id='phone'
+                />
                 <FormControlLabel
                   control={
                     <Checkbox
