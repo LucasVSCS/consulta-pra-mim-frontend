@@ -2,10 +2,16 @@ import React, { useEffect, useState } from 'react'
 import MUIDataTable from 'mui-datatables'
 import { useRouter } from 'next/router'
 import DashboardSearchFilter from './DashboardSearchFilter'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import { IconButton } from '@mui/material'
+import { deleteCarhunter } from '../services/actions/deleteCarhunter'
+import { useSnackbar } from 'notistack'
 
 export default function DashboardTable ({ fetchData }) {
   const router = useRouter()
   const [data, setData] = useState([])
+  const { enqueueSnackbar } = useSnackbar()
 
   // Pagination and Sorting States
   const [page, setPage] = useState(0)
@@ -47,6 +53,22 @@ export default function DashboardTable ({ fetchData }) {
     filters.tradingName
   ])
 
+  const handleRemove = value => {
+    if (window.confirm('Tem certeza que deseja deletar este usuário?')) {
+      deleteCarhunter(value).then(response => {
+        if (response.success) {
+          return enqueueSnackbar('Consultor removido com sucesso!', {
+            variant: 'success'
+          })
+        }
+
+        return enqueueSnackbar('Erro ao remover Consultor!', {
+          variant: 'error'
+        })
+      })
+    }
+  }
+
   const handleSearch = values => {
     setFilters({
       status: values.status,
@@ -76,6 +98,11 @@ export default function DashboardTable ({ fetchData }) {
     rowsPerPageOptions: [5, 10, 25, 50, 100],
     search: false,
     viewColumns: false,
+    setTableProps: () => {
+      return {
+        size: 'small'
+      }
+    },
     onTableChange: (action, tableState) => {
       switch (action) {
         case 'sort':
@@ -144,11 +171,25 @@ export default function DashboardTable ({ fetchData }) {
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
-            <button
-              onClick={() => router.push(`/admin/edit-carhunter/${value}`)}
-            >
-              Editar
-            </button>
+            <>
+              <IconButton
+                aria-label='Editar'
+                size='small'
+                onClick={() => router.push(`/admin/edit-carhunter/${value}`)}
+                color='primary'
+              >
+                <EditIcon />
+              </IconButton>
+
+              <IconButton
+                aria-label='Remover'
+                size='small'
+                color='error'
+                onClick={() => handleRemove(value)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
           )
         }
       }

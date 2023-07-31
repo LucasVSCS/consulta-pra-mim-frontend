@@ -85,7 +85,10 @@ export default function DashboardSearchFilter ({ onSearch, onClearFilters }) {
               </Button>
             </Grid>
             <Grid item alignSelf={'center'}>
-              <Button onClick={() => handleClearFilters(resetForm)}>
+              <Button
+                color='info'
+                onClick={() => handleClearFilters(resetForm)}
+              >
                 Limpar Filtros
               </Button>
             </Grid>
