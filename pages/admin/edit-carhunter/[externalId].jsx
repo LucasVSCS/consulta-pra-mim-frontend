@@ -19,6 +19,8 @@ import {useRouter} from 'next/router'
 import CityInput from '../../../components/CityInput'
 import PageTitle from '../../../components/PageTitle'
 import {PatternFormat} from 'react-number-format'
+import {useFormik} from 'formik';
+import * as Yup from 'yup';
 
 export default function EditCarHunter() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -29,6 +31,89 @@ export default function EditCarHunter() {
     const [phones, setPhones] = useState([{}, {}])
     const [phone, setPhone] = useState('')
     const [selectedCity, setSelectedCity] = useState(null)
+
+    // Formik form state and validation
+    const formik = useFormik({
+        initialValues: {
+            name: '',
+            tradingName: '',
+            email: '',
+            cityId: '',
+            serviceDescription: '',
+            isActive: false,
+            phones: [],
+            socialMedia: {
+                facebookUrl: '',
+                instagramUrl: ''
+            },
+            serviceRange: {
+                searchRadius: '',
+                yearMin: '',
+                yearMax: '',
+                priceMin: '',
+                priceMax: '',
+                brandNew: false
+            }
+        },
+        validationSchema: Yup.object({
+            name: Yup.string().required('Required')
+        }),
+        onSubmit: async values => {
+            const cookies = parseCookies();
+            const token = cookies.token;
+
+            await updateCarHunterData(externalId, values, token);
+        }
+    });
+
+    useEffect(() => {
+        formik.setValues({
+            name: carHunterData.name || '',
+            tradingName: carHunterData.tradingName || '',
+            email: carHunterData.email || '',
+            cityId: carHunterData.city ? carHunterData.city.id : '',
+            serviceDescription: carHunterData.serviceDescription || '',
+            isActive: carHunterData.isActive || false,
+            phones: carHunterData.phones || [],
+            socialMedia: {
+                facebookUrl:
+                    carHunterData.socialMedia && carHunterData.socialMedia.facebookUrl
+                        ? carHunterData.socialMedia.facebookUrl
+                        : '',
+                instagramUrl:
+                    carHunterData.socialMedia && carHunterData.socialMedia.instagramUrl
+                        ? carHunterData.socialMedia.instagramUrl
+                        : ''
+            },
+            serviceRange: {
+                searchRadius:
+                    carHunterData.serviceRange && carHunterData.serviceRange.searchRadius
+                        ? carHunterData.serviceRange.searchRadius
+                        : '',
+                yearMin:
+                    carHunterData.serviceRange && carHunterData.serviceRange.yearMin
+                        ? carHunterData.serviceRange.yearMin
+                        : '',
+                yearMax:
+                    carHunterData.serviceRange && carHunterData.serviceRange.yearMax
+                        ? carHunterData.serviceRange.yearMax
+                        : '',
+                priceMin:
+                    carHunterData.serviceRange && carHunterData.serviceRange.priceMin
+                        ? carHunterData.serviceRange.priceMin
+                        : '',
+                priceMax:
+                    carHunterData.serviceRange && carHunterData.serviceRange.priceMax
+                        ? carHunterData.serviceRange.priceMax
+                        : '',
+                brandNew:
+                    carHunterData.serviceRange && carHunterData.serviceRange.brandNew
+                        ? carHunterData.serviceRange.brandNew
+                        : false
+            }
+        });
+    }, [carHunterData]);
+
 
     useEffect(() => {
         if (carHunterData.city) {
@@ -110,35 +195,6 @@ export default function EditCarHunter() {
         return `(${areaCode}) ${formattedNumber}`
     }
 
-    const handleSave = async () => {
-        const cookies = parseCookies()
-        const token = cookies.token
-
-        const data = {
-            name: carHunterData.name,
-            tradingName: carHunterData.tradingName,
-            email: carHunterData.email,
-            cityId: selectedCity.id,
-            serviceDescription: carHunterData.serviceDescription,
-            isActive: carHunterData.isActive,
-            phones: phones,
-            socialMedia: {
-                facebookUrl: carHunterData.socialMedia.facebookUrl,
-                instagramUrl: carHunterData.socialMedia.instagramUrl
-            },
-            serviceRange: {
-                searchRadius: carHunterData.serviceRange.searchRadius,
-                yearMin: carHunterData.serviceRange.yearMin,
-                yearMax: carHunterData.serviceRange.yearMax,
-                priceMin: carHunterData.serviceRange.priceMin,
-                priceMax: carHunterData.serviceRange.priceMax,
-                brandNew: carHunterData.serviceRange.brandNew
-            }
-        }
-
-        await updateCarHunterData(externalId, data, token)
-    }
-
     async function updateCarHunterData(externalId, data, token) {
         try {
             const response = await fetch(`${apiUrl}/car-hunters/${externalId}`, {
@@ -166,6 +222,7 @@ export default function EditCarHunter() {
             <Box display='flex' flexDirection='column' alignItems='center'>
                 <Box
                     component='form'
+                    onSubmit={formik.handleSubmit}
                     maxWidth={1500}
                     sx={{
                         backgroundColor: '#2F2F2F',
@@ -210,13 +267,12 @@ export default function EditCarHunter() {
                                 margin='normal'
                                 variant='outlined'
                                 size='small'
-                                value={carHunterData.name}
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        name: event.target.value
-                                    }))
-                                }
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.name && formik.errors.name}
+                                helperText={formik.touched.name && formik.errors.name}
+                                name='name'
                                 InputLabelProps={{shrink: true}}
                             />
                             <TextField
@@ -225,13 +281,12 @@ export default function EditCarHunter() {
                                 margin='normal'
                                 size='small'
                                 variant='outlined'
-                                value={carHunterData.email}
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        email: event.target.value
-                                    }))
-                                }
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.email && formik.errors.email}
+                                helperText={formik.touched.email && formik.errors.email}
+                                name='email'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -242,13 +297,12 @@ export default function EditCarHunter() {
                                 margin='normal'
                                 size='small'
                                 variant='outlined'
-                                value={carHunterData.tradingName}
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        tradingName: event.target.value
-                                    }))
-                                }
+                                value={formik.values.tradingName}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.tradingName && formik.errors.tradingName}
+                                helperText={formik.touched.tradingName && formik.errors.tradingName}
+                                name='tradingName'
                                 InputLabelProps={{shrink: true}}
                             />
                             <CityInput
@@ -259,13 +313,9 @@ export default function EditCarHunter() {
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={carHunterData.isActive || false}
-                                        onChange={event =>
-                                            setcarHunterData(prevData => ({
-                                                ...prevData,
-                                                isActive: event.target.checked
-                                            }))
-                                        }
+                                        checked={formik.values.isActive || false}
+                                        onChange={formik.handleChange}
+                                        name='isActive'
                                     />
                                 }
                                 label='Usuário ativo'
@@ -283,19 +333,22 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Facebook'
                                 size='small'
-                                value={
-                                    carHunterData.socialMedia &&
-                                    carHunterData.socialMedia.facebookUrl
+                                value={formik.values.socialMedia.facebookUrl}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.socialMedia &&
+                                    formik.touched.socialMedia.facebookUrl &&
+                                    formik.errors.socialMedia &&
+                                    formik.errors.socialMedia.facebookUrl
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        socialMedia: {
-                                            ...prevData.socialMedia,
-                                            facebookUrl: event.target.value
-                                        }
-                                    }))
+                                helperText={
+                                    formik.touched.socialMedia &&
+                                    formik.touched.socialMedia.facebookUrl &&
+                                    formik.errors.socialMedia &&
+                                    formik.errors.socialMedia.facebookUrl
                                 }
+                                name='socialMedia.facebookUrl'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -304,19 +357,22 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Instagram'
                                 size='small'
-                                value={
-                                    carHunterData.socialMedia &&
-                                    carHunterData.socialMedia.instagramUrl
+                                value={formik.values.socialMedia.instagramUrl}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.socialMedia &&
+                                    formik.touched.socialMedia.instagramUrl &&
+                                    formik.errors.socialMedia &&
+                                    formik.errors.socialMedia.instagramUrl
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        socialMedia: {
-                                            ...prevData.socialMedia,
-                                            instagramUrl: event.target.value
-                                        }
-                                    }))
+                                helperText={
+                                    formik.touched.socialMedia &&
+                                    formik.touched.socialMedia.instagramUrl &&
+                                    formik.errors.socialMedia &&
+                                    formik.errors.socialMedia.instagramUrl
                                 }
+                                name='socialMedia.instagramUrl'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -362,22 +418,17 @@ export default function EditCarHunter() {
                             <OutlinedInput
                                 fullWidth
                                 size='small'
-                                value={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.searchRadius
+                                value={formik.values.serviceRange.searchRadius}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceRange &&
+                                    formik.touched.serviceRange.searchRadius &&
+                                    formik.errors.serviceRange &&
+                                    formik.errors.serviceRange.searchRadius
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceRange: {
-                                            ...prevData.serviceRange,
-                                            searchRadius: event.target.value
-                                        }
-                                    }))
-                                }
-                                endAdornment={
-                                    <InputAdornment position='end'>km</InputAdornment>
-                                }
+                                name='serviceRange.searchRadius'
+                                endAdornment={<InputAdornment position='end'>km</InputAdornment>}
                             />
                             <FormHelperText>Área de cobertura</FormHelperText>
                         </Grid>
@@ -386,19 +437,16 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Year MIN'
                                 size='small'
-                                value={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.yearMin
+                                value={formik.values.serviceRange.yearMin}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceRange &&
+                                    formik.touched.serviceRange.yearMin &&
+                                    formik.errors.serviceRange &&
+                                    formik.errors.serviceRange.yearMin
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceRange: {
-                                            ...prevData.serviceRange,
-                                            yearMin: event.target.value
-                                        }
-                                    }))
-                                }
+                                name='serviceRange.yearMin'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -407,45 +455,25 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Year MAX'
                                 size='small'
-                                value={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.yearMax
+                                value={formik.values.serviceRange.yearMax}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceRange &&
+                                    formik.touched.serviceRange.yearMax &&
+                                    formik.errors.serviceRange &&
+                                    formik.errors.serviceRange.yearMax
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceRange: {
-                                            ...prevData.serviceRange,
-                                            yearMax: event.target.value
-                                        }
-                                    }))
-                                }
-                                disabled={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.brandNew
-                                }
+                                disabled={formik.values.serviceRange.brandNew}
+                                name='serviceRange.yearMax'
                                 InputLabelProps={{shrink: true}}
                             />
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        checked={
-                                            (carHunterData.serviceRange &&
-                                                carHunterData.serviceRange.brandNew) ||
-                                            false
-                                        }
-                                        onChange={event => {
-                                            setcarHunterData(prevData => ({
-                                                ...prevData,
-                                                serviceRange: {
-                                                    ...prevData.serviceRange,
-                                                    brandNew: event.target.checked,
-                                                    yearMax: event.target.checked
-                                                        ? ''
-                                                        : prevData.serviceRange.yearMax
-                                                }
-                                            }))
-                                        }}
+                                        checked={formik.values.serviceRange.brandNew || false}
+                                        onChange={formik.handleChange}
+                                        name='serviceRange.brandNew'
                                     />
                                 }
                                 label='0km'
@@ -456,19 +484,16 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Price MIN'
                                 size='small'
-                                value={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.priceMin
+                                value={formik.values.serviceRange.priceMin}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceRange &&
+                                    formik.touched.serviceRange.priceMin &&
+                                    formik.errors.serviceRange &&
+                                    formik.errors.serviceRange.priceMin
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceRange: {
-                                            ...prevData.serviceRange,
-                                            priceMin: event.target.value
-                                        }
-                                    }))
-                                }
+                                name='serviceRange.priceMin'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -477,19 +502,16 @@ export default function EditCarHunter() {
                                 fullWidth
                                 label='Price MAX'
                                 size='small'
-                                value={
-                                    carHunterData.serviceRange &&
-                                    carHunterData.serviceRange.priceMax
+                                value={formik.values.serviceRange.priceMax}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceRange &&
+                                    formik.touched.serviceRange.priceMax &&
+                                    formik.errors.serviceRange &&
+                                    formik.errors.serviceRange.priceMax
                                 }
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceRange: {
-                                            ...prevData.serviceRange,
-                                            priceMax: event.target.value
-                                        }
-                                    }))
-                                }
+                                name='serviceRange.priceMax'
                                 InputLabelProps={{shrink: true}}
                             />
                         </Grid>
@@ -505,20 +527,25 @@ export default function EditCarHunter() {
                                 margin='normal'
                                 size='small'
                                 multiline
-                                rows={10}
+                                rows={6}
                                 InputLabelProps={{shrink: true}}
-                                value={carHunterData.serviceDescription}
-                                onChange={event =>
-                                    setcarHunterData(prevData => ({
-                                        ...prevData,
-                                        serviceDescription: event.target.value
-                                    }))
+                                value={formik.values.serviceDescription}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={
+                                    formik.touched.serviceDescription &&
+                                    formik.errors.serviceDescription
                                 }
+                                helperText={
+                                    formik.touched.serviceDescription &&
+                                    formik.errors.serviceDescription
+                                }
+                                name='serviceDescription'
                             />
                         </Grid>
                     </Grid>
-                    <Grid item xs alignItems={'end'}>
-                        <Button variant='contained' onClick={handleSave}>
+                    <Grid item xs>
+                        <Button variant='contained' type='submit'>
                             Salvar
                         </Button>
                     </Grid>
