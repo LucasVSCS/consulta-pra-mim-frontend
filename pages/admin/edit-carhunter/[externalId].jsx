@@ -1,16 +1,16 @@
 import {
-  Avatar,
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormHelperText,
-  Grid,
-  InputAdornment,
-  OutlinedInput,
-  Paper,
-  TextField,
-  Typography
+    Avatar,
+    Box,
+    Button,
+    Checkbox,
+    FormControlLabel,
+    FormHelperText,
+    Grid,
+    InputAdornment,
+    OutlinedInput,
+    Paper,
+    TextField,
+    Typography
 } from '@mui/material'
 import Header from '../../../components/Header'
 import {useEffect, useState} from 'react'
@@ -333,6 +333,7 @@ export default function EditCarHunter() {
                                     fullWidth
                                     size='small'
                                     value={formatPhoneNumber(phone.areaCode, phone.number)}
+                                    onChange={event => handlePhoneChange(event, index)}
                                     customInput={TextField}
                                     format='(##) #####-####'
                                     id='phone'
