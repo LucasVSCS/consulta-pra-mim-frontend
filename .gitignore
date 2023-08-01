@@ -28,3 +28,13 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# IDEA
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/.gitignore
+/.idea/consulta-pra-mim-front.iml
+/.idea/sonarlint/issuestore/index.pb
+/.idea/sonarlint/securityhotspotstore/index.pb
+/.idea/jpa-buddy.xml
+/.idea/misc.xml
