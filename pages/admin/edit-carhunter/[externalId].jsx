@@ -38,27 +38,19 @@ export default function EditCarHunter() {
             name: '',
             tradingName: '',
             email: '',
-            cityId: '',
+            selectedCity: null,
             serviceDescription: '',
             isActive: false,
             phones: [],
             socialMedia: {
-                facebookUrl: '',
-                instagramUrl: ''
+                facebookUrl: '', instagramUrl: ''
             },
             serviceRange: {
-                searchRadius: '',
-                yearMin: '',
-                yearMax: '',
-                priceMin: '',
-                priceMax: '',
-                brandNew: false
+                searchRadius: '', yearMin: '', yearMax: '', priceMin: '', priceMax: '', brandNew: false
             }
-        },
-        validationSchema: Yup.object({
+        }, validationSchema: Yup.object({
             name: Yup.string().required('Required')
-        }),
-        onSubmit: async values => {
+        }), onSubmit: async values => {
             const cookies = parseCookies();
             const token = cookies.token;
 
@@ -76,54 +68,31 @@ export default function EditCarHunter() {
             isActive: carHunterData.isActive || false,
             phones: carHunterData.phones || [],
             socialMedia: {
-                facebookUrl:
-                    carHunterData.socialMedia && carHunterData.socialMedia.facebookUrl
-                        ? carHunterData.socialMedia.facebookUrl
-                        : '',
-                instagramUrl:
-                    carHunterData.socialMedia && carHunterData.socialMedia.instagramUrl
-                        ? carHunterData.socialMedia.instagramUrl
-                        : ''
+                facebookUrl: carHunterData.socialMedia && carHunterData.socialMedia.facebookUrl ? carHunterData.socialMedia.facebookUrl : '',
+                instagramUrl: carHunterData.socialMedia && carHunterData.socialMedia.instagramUrl ? carHunterData.socialMedia.instagramUrl : ''
             },
             serviceRange: {
-                searchRadius:
-                    carHunterData.serviceRange && carHunterData.serviceRange.searchRadius
-                        ? carHunterData.serviceRange.searchRadius
-                        : '',
-                yearMin:
-                    carHunterData.serviceRange && carHunterData.serviceRange.yearMin
-                        ? carHunterData.serviceRange.yearMin
-                        : '',
-                yearMax:
-                    carHunterData.serviceRange && carHunterData.serviceRange.yearMax
-                        ? carHunterData.serviceRange.yearMax
-                        : '',
-                priceMin:
-                    carHunterData.serviceRange && carHunterData.serviceRange.priceMin
-                        ? carHunterData.serviceRange.priceMin
-                        : '',
-                priceMax:
-                    carHunterData.serviceRange && carHunterData.serviceRange.priceMax
-                        ? carHunterData.serviceRange.priceMax
-                        : '',
-                brandNew:
-                    carHunterData.serviceRange && carHunterData.serviceRange.brandNew
-                        ? carHunterData.serviceRange.brandNew
-                        : false
+                searchRadius: carHunterData.serviceRange && carHunterData.serviceRange.searchRadius ? carHunterData.serviceRange.searchRadius : '',
+                yearMin: carHunterData.serviceRange && carHunterData.serviceRange.yearMin ? carHunterData.serviceRange.yearMin : '',
+                yearMax: carHunterData.serviceRange && carHunterData.serviceRange.yearMax ? carHunterData.serviceRange.yearMax : '',
+                priceMin: carHunterData.serviceRange && carHunterData.serviceRange.priceMin ? carHunterData.serviceRange.priceMin : '',
+                priceMax: carHunterData.serviceRange && carHunterData.serviceRange.priceMax ? carHunterData.serviceRange.priceMax : '',
+                brandNew: carHunterData.serviceRange && carHunterData.serviceRange.brandNew ? carHunterData.serviceRange.brandNew : false
             }
         });
     }, [carHunterData]);
 
-
     useEffect(() => {
-        if (carHunterData.city) {
-            setSelectedCity({
-                id: carHunterData.city.id,
-                name: carHunterData.city.name,
-                ufCode: carHunterData.city.ufCode
+        if (selectedCity) {
+            setcarHunterData(prevCarHunterData => {
+                const newCarHunterData = {...prevCarHunterData}
+                newCarHunterData.city = {
+                    id: selectedCity.id, name: selectedCity.name, ufCode: selectedCity.ufCode
+                }
+                return newCarHunterData
             })
         }
-    }, [carHunterData.city])
+    }, [selectedCity])
 
     useEffect(() => {
         setProfilePicture(carHunterData.logoUrl)
@@ -198,12 +167,9 @@ export default function EditCarHunter() {
     async function updateCarHunterData(externalId, data, token) {
         try {
             const response = await fetch(`${apiUrl}/car-hunters/${externalId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${token}`
-                },
-                body: JSON.stringify(data)
+                method: 'PUT', headers: {
+                    'Content-Type': 'application/json', Authorization: `${token}`
+                }, body: JSON.stringify(data)
             })
             if (!response.ok) {
                 throw new Error(`An error occurred: ${response.statusText}`)
@@ -214,345 +180,282 @@ export default function EditCarHunter() {
         }
     }
 
-    return (
-        <Paper sx={{height: '100vh'}}>
-            <PageTitle label={'Editar Consultor Automotivo'}/>
-            <Header title={'Editar Consultor Automotivo'}/>
+    return (<Paper sx={{height: '100vh'}}>
+        <PageTitle label={'Editar Consultor Automotivo'}/>
+        <Header title={'Editar Consultor Automotivo'}/>
 
-            <Box display='flex' flexDirection='column' alignItems='center'>
-                <Box
-                    component='form'
-                    onSubmit={formik.handleSubmit}
-                    maxWidth={1500}
-                    sx={{
-                        backgroundColor: '#2F2F2F',
-                        padding: 2,
-                        border: 1
-                    }}
-                >
-                    <Grid container spacing={1}>
-                        <Grid item xs={12} sm={2}>
-                            <Typography
-                                display='flex'
-                                justifyContent='center'
-                                alignItems='center'
-                                variant='h6'
-                                marginBottom={1}
-                            >
-                                Dados do consultor
-                            </Typography>
-                            <Box display='flex' justifyContent='center' alignItems='center'>
-                                <input
-                                    type='file'
-                                    accept='image/*'
-                                    onChange={handleProfilePictureChange}
-                                    hidden
-                                    id='profile-picture-input'
+        <Box display='flex' flexDirection='column' alignItems='center'>
+            <Box
+                component='form'
+                onSubmit={formik.handleSubmit}
+                maxWidth={1500}
+                sx={{
+                    backgroundColor: '#2F2F2F', padding: 2, border: 1
+                }}
+            >
+                <Grid container spacing={1}>
+                    <Grid item xs={12} sm={2}>
+                        <Typography
+                            display='flex'
+                            justifyContent='center'
+                            alignItems='center'
+                            variant='h6'
+                            marginBottom={1}
+                        >
+                            Dados do consultor
+                        </Typography>
+                        <Box display='flex' justifyContent='center' alignItems='center'>
+                            <input
+                                type='file'
+                                accept='image/*'
+                                onChange={handleProfilePictureChange}
+                                hidden
+                                id='profile-picture-input'
+                            />
+                            <label htmlFor='profile-picture-input'>
+                                <Avatar
+                                    src={profilePicture}
+                                    alt='Profile Picture'
+                                    sx={{width: 100, height: 100, cursor: 'pointer'}}
                                 />
-                                <label htmlFor='profile-picture-input'>
-                                    <Avatar
-                                        src={profilePicture}
-                                        alt='Profile Picture'
-                                        sx={{width: 100, height: 100, cursor: 'pointer'}}
-                                    />
-                                </label>
-                            </Box>
-                        </Grid>
+                            </label>
+                        </Box>
+                    </Grid>
 
-                        {/* Inicio inputs dos dados do Consultor */}
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Name'
-                                margin='normal'
-                                variant='outlined'
-                                size='small'
-                                value={formik.values.name}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.name && formik.errors.name}
-                                helperText={formik.touched.name && formik.errors.name}
-                                name='name'
-                                InputLabelProps={{shrink: true}}
-                            />
-                            <TextField
-                                fullWidth
-                                label='Email'
-                                margin='normal'
-                                size='small'
-                                variant='outlined'
-                                value={formik.values.email}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.email && formik.errors.email}
-                                helperText={formik.touched.email && formik.errors.email}
-                                name='email'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Consultant Name'
-                                margin='normal'
-                                size='small'
-                                variant='outlined'
-                                value={formik.values.tradingName}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.tradingName && formik.errors.tradingName}
-                                helperText={formik.touched.tradingName && formik.errors.tradingName}
-                                name='tradingName'
-                                InputLabelProps={{shrink: true}}
-                            />
-                            <CityInput
-                                sx={{marginTop: 2}}
-                                selectedCity={selectedCity}
-                                setSelectedCity={setSelectedCity}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={formik.values.isActive || false}
-                                        onChange={formik.handleChange}
-                                        name='isActive'
-                                    />
-                                }
-                                label='Usuário ativo'
-                            />
-                        </Grid>
-                        {/* Fim inputs dos dados do Consultor */}
-
-                        <Grid item xs={12}>
-                            <Typography variant='h6'>Redes Sociais</Typography>
-                        </Grid>
-
-                        {/* Inicio inputs dos dados das redes sociais */}
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Facebook'
-                                size='small'
-                                value={formik.values.socialMedia.facebookUrl}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.socialMedia &&
-                                    formik.touched.socialMedia.facebookUrl &&
-                                    formik.errors.socialMedia &&
-                                    formik.errors.socialMedia.facebookUrl
-                                }
-                                helperText={
-                                    formik.touched.socialMedia &&
-                                    formik.touched.socialMedia.facebookUrl &&
-                                    formik.errors.socialMedia &&
-                                    formik.errors.socialMedia.facebookUrl
-                                }
-                                name='socialMedia.facebookUrl'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Instagram'
-                                size='small'
-                                value={formik.values.socialMedia.instagramUrl}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.socialMedia &&
-                                    formik.touched.socialMedia.instagramUrl &&
-                                    formik.errors.socialMedia &&
-                                    formik.errors.socialMedia.instagramUrl
-                                }
-                                helperText={
-                                    formik.touched.socialMedia &&
-                                    formik.touched.socialMedia.instagramUrl &&
-                                    formik.errors.socialMedia &&
-                                    formik.errors.socialMedia.instagramUrl
-                                }
-                                name='socialMedia.instagramUrl'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        {/* Fim inputs dos dados das redes sociais */}
-
-                        <Grid item xs={12}>
-                            <Typography variant='h6'>Telefones</Typography>
-                        </Grid>
-
-                        {/* Inicio inputs dos telefones */}
-                        {phones.map((phone, index) => (
-                            <Grid item xs key={index}>
-                                <PatternFormat
-                                    fullWidth
-                                    size='small'
-                                    value={formatPhoneNumber(phone.areaCode, phone.number)}
-                                    onChange={event => handlePhoneChange(event, index)}
-                                    customInput={TextField}
-                                    format='(##) #####-####'
-                                    id='phone'
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={phone.isWhatsapp || false}
-                                            onChange={event => handleWhatsAppChange(event, index)}
-                                        />
-                                    }
-                                    label='É Whastapp'
-                                />
-                            </Grid>
-                        ))}
-                        {/* Fim inputs dos telefones */}
-
-                        <Grid item xs={12}>
-                            <Typography variant='h6'>
-                                Especificações do serviço de consulta
-                            </Typography>
-                        </Grid>
-
-                        {/* Inicio inputs dos dados do serviço */}
-                        <Grid item xs>
-                            <OutlinedInput
-                                fullWidth
-                                size='small'
-                                value={formik.values.serviceRange.searchRadius}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceRange &&
-                                    formik.touched.serviceRange.searchRadius &&
-                                    formik.errors.serviceRange &&
-                                    formik.errors.serviceRange.searchRadius
-                                }
-                                name='serviceRange.searchRadius'
-                                endAdornment={<InputAdornment position='end'>km</InputAdornment>}
-                            />
-                            <FormHelperText>Área de cobertura</FormHelperText>
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Year MIN'
-                                size='small'
-                                value={formik.values.serviceRange.yearMin}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceRange &&
-                                    formik.touched.serviceRange.yearMin &&
-                                    formik.errors.serviceRange &&
-                                    formik.errors.serviceRange.yearMin
-                                }
-                                name='serviceRange.yearMin'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Year MAX'
-                                size='small'
-                                value={formik.values.serviceRange.yearMax}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceRange &&
-                                    formik.touched.serviceRange.yearMax &&
-                                    formik.errors.serviceRange &&
-                                    formik.errors.serviceRange.yearMax
-                                }
-                                disabled={formik.values.serviceRange.brandNew}
-                                name='serviceRange.yearMax'
-                                InputLabelProps={{shrink: true}}
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={formik.values.serviceRange.brandNew || false}
-                                        onChange={formik.handleChange}
-                                        name='serviceRange.brandNew'
-                                    />
-                                }
-                                label='0km'
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Price MIN'
-                                size='small'
-                                value={formik.values.serviceRange.priceMin}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceRange &&
-                                    formik.touched.serviceRange.priceMin &&
-                                    formik.errors.serviceRange &&
-                                    formik.errors.serviceRange.priceMin
-                                }
-                                name='serviceRange.priceMin'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Price MAX'
-                                size='small'
-                                value={formik.values.serviceRange.priceMax}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceRange &&
-                                    formik.touched.serviceRange.priceMax &&
-                                    formik.errors.serviceRange &&
-                                    formik.errors.serviceRange.priceMax
-                                }
-                                name='serviceRange.priceMax'
-                                InputLabelProps={{shrink: true}}
-                            />
-                        </Grid>
-                        {/* Fim inputs dos dados do serviço */}
-
-                        <Grid item xs={12}>
-                            <Typography variant='h6'>Descrição do serviço</Typography>
-                        </Grid>
-                        <Grid item xs>
-                            <TextField
-                                fullWidth
-                                label='Service Description'
-                                margin='normal'
-                                size='small'
-                                multiline
-                                rows={6}
-                                InputLabelProps={{shrink: true}}
-                                value={formik.values.serviceDescription}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                error={
-                                    formik.touched.serviceDescription &&
-                                    formik.errors.serviceDescription
-                                }
-                                helperText={
-                                    formik.touched.serviceDescription &&
-                                    formik.errors.serviceDescription
-                                }
-                                name='serviceDescription'
-                            />
-                        </Grid>
+                    {/* Inicio inputs dos dados do Consultor */}
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Name'
+                            margin='normal'
+                            variant='outlined'
+                            size='small'
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.name && formik.errors.name}
+                            helperText={formik.touched.name && formik.errors.name}
+                            name='name'
+                            InputLabelProps={{shrink: true}}
+                        />
+                        <TextField
+                            fullWidth
+                            label='Email'
+                            margin='normal'
+                            size='small'
+                            variant='outlined'
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.email && formik.errors.email}
+                            helperText={formik.touched.email && formik.errors.email}
+                            name='email'
+                            InputLabelProps={{shrink: true}}
+                        />
                     </Grid>
                     <Grid item xs>
-                        <Button variant='contained' type='submit'>
-                            Salvar
-                        </Button>
+                        <TextField
+                            fullWidth
+                            label='Consultant Name'
+                            margin='normal'
+                            size='small'
+                            variant='outlined'
+                            value={formik.values.tradingName}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.tradingName && formik.errors.tradingName}
+                            helperText={formik.touched.tradingName && formik.errors.tradingName}
+                            name='tradingName'
+                            InputLabelProps={{shrink: true}}
+                        />
+                        <CityInput
+                            sx={{marginTop: 2}}
+                            value={carHunterData.city}
+                            onChange={(event, newValue) => setSelectedCity(newValue)}
+                        />
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={formik.values.isActive || false}
+                                onChange={formik.handleChange}
+                                name='isActive'
+                            />}
+                            label='Usuário ativo'
+                        />
                     </Grid>
-                </Box>
+                    {/* Fim inputs dos dados do Consultor */}
+
+                    <Grid item xs={12}>
+                        <Typography variant='h6'>Redes Sociais</Typography>
+                    </Grid>
+
+                    {/* Inicio inputs dos dados das redes sociais */}
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Facebook'
+                            size='small'
+                            value={formik.values.socialMedia.facebookUrl}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.socialMedia && formik.touched.socialMedia.facebookUrl && formik.errors.socialMedia && formik.errors.socialMedia.facebookUrl}
+                            helperText={formik.touched.socialMedia && formik.touched.socialMedia.facebookUrl && formik.errors.socialMedia && formik.errors.socialMedia.facebookUrl}
+                            name='socialMedia.facebookUrl'
+                            InputLabelProps={{shrink: true}}
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Instagram'
+                            size='small'
+                            value={formik.values.socialMedia.instagramUrl}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.socialMedia && formik.touched.socialMedia.instagramUrl && formik.errors.socialMedia && formik.errors.socialMedia.instagramUrl}
+                            helperText={formik.touched.socialMedia && formik.touched.socialMedia.instagramUrl && formik.errors.socialMedia && formik.errors.socialMedia.instagramUrl}
+                            name='socialMedia.instagramUrl'
+                            InputLabelProps={{shrink: true}}
+                        />
+                    </Grid>
+                    {/* Fim inputs dos dados das redes sociais */}
+
+                    <Grid item xs={12}>
+                        <Typography variant='h6'>Telefones</Typography>
+                    </Grid>
+
+                    {/* Inicio inputs dos telefones */}
+                    {phones.map((phone, index) => (<Grid item xs key={index}>
+                        <PatternFormat
+                            fullWidth
+                            size='small'
+                            value={formatPhoneNumber(phone.areaCode, phone.number)}
+                            onChange={event => handlePhoneChange(event, index)}
+                            customInput={TextField}
+                            format='(##) #####-####'
+                            id='phone'
+                        />
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={phone.isWhatsapp || false}
+                                onChange={event => handleWhatsAppChange(event, index)}
+                            />}
+                            label='É Whastapp'
+                        />
+                    </Grid>))}
+                    {/* Fim inputs dos telefones */}
+
+                    <Grid item xs={12}>
+                        <Typography variant='h6'>
+                            Especificações do serviço de consulta
+                        </Typography>
+                    </Grid>
+
+                    {/* Inicio inputs dos dados do serviço */}
+                    <Grid item xs>
+                        <OutlinedInput
+                            fullWidth
+                            size='small'
+                            value={formik.values.serviceRange.searchRadius}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceRange && formik.touched.serviceRange.searchRadius && formik.errors.serviceRange && formik.errors.serviceRange.searchRadius}
+                            name='serviceRange.searchRadius'
+                            endAdornment={<InputAdornment position='end'>km</InputAdornment>}
+                        />
+                        <FormHelperText>Área de cobertura</FormHelperText>
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Year MIN'
+                            size='small'
+                            value={formik.values.serviceRange.yearMin}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceRange && formik.touched.serviceRange.yearMin && formik.errors.serviceRange && formik.errors.serviceRange.yearMin}
+                            name='serviceRange.yearMin'
+                            InputLabelProps={{shrink: true}}
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Year MAX'
+                            size='small'
+                            value={formik.values.serviceRange.yearMax}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceRange && formik.touched.serviceRange.yearMax && formik.errors.serviceRange && formik.errors.serviceRange.yearMax}
+                            disabled={formik.values.serviceRange.brandNew}
+                            name='serviceRange.yearMax'
+                            InputLabelProps={{shrink: true}}
+                        />
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={formik.values.serviceRange.brandNew || false}
+                                onChange={formik.handleChange}
+                                name='serviceRange.brandNew'
+                            />}
+                            label='0km'
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Price MIN'
+                            size='small'
+                            value={formik.values.serviceRange.priceMin}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceRange && formik.touched.serviceRange.priceMin && formik.errors.serviceRange && formik.errors.serviceRange.priceMin}
+                            name='serviceRange.priceMin'
+                            InputLabelProps={{shrink: true}}
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Price MAX'
+                            size='small'
+                            value={formik.values.serviceRange.priceMax}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceRange && formik.touched.serviceRange.priceMax && formik.errors.serviceRange && formik.errors.serviceRange.priceMax}
+                            name='serviceRange.priceMax'
+                            InputLabelProps={{shrink: true}}
+                        />
+                    </Grid>
+                    {/* Fim inputs dos dados do serviço */}
+
+                    <Grid item xs={12}>
+                        <Typography variant='h6'>Descrição do serviço</Typography>
+                    </Grid>
+                    <Grid item xs>
+                        <TextField
+                            fullWidth
+                            label='Service Description'
+                            margin='normal'
+                            size='small'
+                            multiline
+                            rows={6}
+                            InputLabelProps={{shrink: true}}
+                            value={formik.values.serviceDescription}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            error={formik.touched.serviceDescription && formik.errors.serviceDescription}
+                            helperText={formik.touched.serviceDescription && formik.errors.serviceDescription}
+                            name='serviceDescription'
+                        />
+                    </Grid>
+                </Grid>
+                <Grid item xs>
+                    <Button variant='contained' type='submit'>
+                        Salvar
+                    </Button>
+                </Grid>
             </Box>
-        </Paper>
-    )
+        </Box>
+    </Paper>)
 }
 
 export const getServerSideProps = async ctx => {
@@ -562,8 +465,7 @@ export const getServerSideProps = async ctx => {
     if (!token) {
         return {
             redirect: {
-                destination: '/auth/login',
-                permanent: false
+                destination: '/auth/login', permanent: false
             }
         }
     }

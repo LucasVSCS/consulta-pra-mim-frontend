@@ -29,6 +29,7 @@ export default function CityInput ({
       sx={sx}
       size={size}
       options={citySearchResults}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={option => `${option.name} - ${option.ufCode}`}
       value={value || null}
       onChange={onChange}
