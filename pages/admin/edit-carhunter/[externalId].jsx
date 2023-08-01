@@ -32,7 +32,6 @@ export default function EditCarHunter() {
     const [phone, setPhone] = useState('')
     const [selectedCity, setSelectedCity] = useState(null)
 
-    // Formik form state and validation
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -49,7 +48,22 @@ export default function EditCarHunter() {
                 searchRadius: '', yearMin: '', yearMax: '', priceMin: '', priceMax: '', brandNew: false
             }
         }, validationSchema: Yup.object({
-            name: Yup.string().required('Required')
+            name: Yup.string().required('Campo obrigatório'),
+            tradingName: Yup.string().required('Campo obrigatório'),
+            email: Yup.string().email('Endereço de email inválido').required('Campo obrigatório'),
+            cityId: Yup.string().required('Campo obrigatório'),
+            serviceDescription: Yup.string().required('Campo obrigatório'),
+            isActive: Yup.boolean(),
+            socialMedia: Yup.object({
+                facebookUrl: Yup.string().url('URL inválida'), instagramUrl: Yup.string().url('URL inválida')
+            }),
+            serviceRange: Yup.object({
+                searchRadius: Yup.number().min(1, 'Precisa ser maior que 0'),
+                yearMin: Yup.number().min(1950, 'Precisa ser maior que 1950'),
+                yearMax: Yup.number().max(new Date().getFullYear() + 1, `Não pode ser maior que ${new Date().getFullYear() + 1}`),
+                priceMin: Yup.number().min(0, 'Must be greater than or equal to 0'),
+                priceMax: Yup.number().min(0, 'Must be greater than or equal to 0'),
+            })
         }), onSubmit: async values => {
             const cookies = parseCookies();
             const token = cookies.token;
@@ -185,13 +199,10 @@ export default function EditCarHunter() {
         <Header title={'Editar Consultor Automotivo'}/>
 
         <Box display='flex' flexDirection='column' alignItems='center'>
-            <Box
-                component='form'
-                onSubmit={formik.handleSubmit}
-                maxWidth={1500}
-                sx={{
-                    backgroundColor: '#2F2F2F', padding: 2, border: 1
-                }}
+            <Box component='form' onSubmit={formik.handleSubmit} maxWidth={1500}
+                 sx={{
+                     backgroundColor: '#2F2F2F', padding: 2, border: 1
+                 }}
             >
                 <Grid container spacing={1}>
                     <Grid item xs={12} sm={2}>
@@ -338,6 +349,7 @@ export default function EditCarHunter() {
                             control={<Checkbox
                                 checked={phone.isWhatsapp || false}
                                 onChange={event => handleWhatsAppChange(event, index)}
+                                disabled={!phone.areaCode || !phone.number}
                             />}
                             label='É Whastapp'
                         />
