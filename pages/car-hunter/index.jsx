@@ -1,192 +1,120 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Grid,
-  Pagination,
-  Paper,
-  TextField,
-  Typography
-} from '@mui/material'
+import {Avatar, Box, Button, Grid, Pagination, Paper, Typography} from '@mui/material'
 import Header from '../../components/Header'
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import PageTitle from '../../components/PageTitle'
-import { useRouter } from 'next/router'
+import {useRouter} from 'next/router'
+import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
+import SearchFilters from "../../components/indexCarHunterPage/searchFilters";
 
-export default function CarHunterSearchPage () {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+export default function CarHunterSearchPage() {
+    const router = useRouter()
+    const [carHunters, setCarHunters] = useState([])
+    const [totalPages, setTotalPages] = useState(0)
 
-  const router = useRouter()
-  const [carHunters, setCarHunters] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [nameFilter, setNameFilter] = useState('')
-  const [tradingNameFilter, setTradingNameFilter] = useState('')
-  const [emailFilter, setEmailFilter] = useState('')
-  const [serviceDescriptionFilter, setServiceDescriptionFilter] = useState('')
+    const [filters, setFilters] = useState({
+        status: '',
+        cityId: '',
+        name: '',
+        tradingName: '',
+        page: 0,
+        rowsPerPage: 12
+    })
 
-  useEffect(() => {
-    const fetchCarHunters = async () => {
-      const cityId = router.query.cityId
-      const url = new URL(`${apiUrl}/car-hunters`)
+    useEffect(() => {
+        fetchIndexCarhunters(filters).then(result => {
+            setTotalPages(result.totalPages)
+            setCarHunters(result.content)
+        })
+    }, [router.query.cityId, filters.page, filters.status, filters.cityId, filters.name, filters.tradingName])
 
-      url.searchParams.append('page', currentPage)
-      if (cityId) url.searchParams.append('cityId', cityId)
-      if (nameFilter) url.searchParams.append('name', nameFilter)
-      if (tradingNameFilter)
-        url.searchParams.append('tradingName', tradingNameFilter)
-      if (emailFilter) url.searchParams.append('email', emailFilter)
-      if (serviceDescriptionFilter)
-        url.searchParams.append('serviceDescription', serviceDescriptionFilter)
-
-      try {
-        const response = await fetch(url.toString())
-        const data = await response.json()
-
-        setCarHunters(data.content)
-      } catch (error) {}
+    const setCurrentPage = (event, value) => {
+        console.log(value)
+        setFilters({...filters, page: --value})
     }
 
-    fetchCarHunters()
-  }, [
-    router.query.cityId,
-    currentPage,
-    nameFilter,
-    tradingNameFilter,
-    emailFilter,
-    serviceDescriptionFilter
-  ])
+    const handleMoreInfoClick = carHunterId => {
+        router.push(`/car-hunter/${carHunterId}`)
+    }
 
-  const handleSearchClick = () => {
-    setCurrentPage(1)
-  }
+    const links = [{name: 'Pesquisar Consultores', url: '#'}, {
+        name: 'Torne-se um Consultor', url: '/car-hunter/signup'
+    }]
 
-  const handleMoreInfoClick = carHunterId => {
-    router.push(`/car-hunter/${carHunterId}`)
-  }
+    return (
+        <Paper sx={{height: "100vh", overflowY: "hidden"}}>
+            <PageTitle label={"Pesquisar Consultores"}/>
+            <Header logoUrlRedirect={"/"} links={links} isUserLogged={false}/>
 
-  return (
-    <Paper sx={{ height: '100vh' }}>
-      <PageTitle label={'Pesquisar Consultores'} />
-      <Header title={'Pesquisar Consultores'} />
+            <Box sx={{
+                display: "flex",
+                padding: 2,
+                height: "100%",
+                boxSizing: "border-box"
+            }}>
+                <Grid container>
+                    <Grid item xs={2}>
+                        <SearchFilters filters={filters} setFilters={setFilters}/>
+                    </Grid>
 
-      <Container>
-        <Box
-          sx={{
-            display: 'flex',
-            backgroundColor: '#2F2F2F',
-            padding: 2,
-            border: 2,
-            borderColor: '#f98989'
-          }}
-        >
-          <Box sx={{ flex: 0.2, p: 1 }}>
-            <Typography
-              variant='h6'
-              align='center'
-              sx={{ fontWeight: 'light', fontSize: '16px', mb: 2 }}
-            >
-              Filtros de pesquisa
-            </Typography>
-            <TextField
-              size='small'
-              label='Nome'
-              fullWidth
-              sx={{ mb: 1 }}
-              value={nameFilter}
-              onChange={event => setNameFilter(event.target.value)}
-            />
-            <TextField
-              size='small'
-              label='Nome do Consultor'
-              fullWidth
-              sx={{ mb: 1 }}
-              value={tradingNameFilter}
-              onChange={event => setTradingNameFilter(event.target.value)}
-            />
-            <TextField
-              size='small'
-              label='Email'
-              fullWidth
-              value={emailFilter}
-              onChange={event => setEmailFilter(event.target.value)}
-            />
-            <TextField
-              fullWidth
-              label='Descrição do Serviço'
-              margin='normal'
-              multiline
-              rows={6}
-              value={serviceDescriptionFilter}
-              onChange={event =>
-                setServiceDescriptionFilter(event.target.value)
-              }
-            />
-
-            <Button fullWidth variant='contained' onClick={handleSearchClick}>
-              Pesquisar
-            </Button>
-          </Box>
-          <Box sx={{ flex: 0.8, p: 2 }}>
-            {carHunters && carHunters.length === 0 ? (
-              <Typography variant='h6' align='center'>
-                Nenhum resultado encontrado
-              </Typography>
-            ) : (
-              <>
-                <Grid container spacing={2}>
-                  {carHunters &&
-                    carHunters.map(carHunter => (
-                      <Grid item xs={3} key={carHunter.externalId}>
-                        <Box
-                          sx={{
-                            minHeight: 150,
-                            bgcolor: 'grey.500',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 1
-                          }}
-                        >
-                          <Avatar
-                            src={carHunter.logoUrl}
-                            alt='Profile Picture'
-                            sx={{
-                              width: 100,
-                              height: 100,
-                              cursor: 'pointer',
-                              mb: 1,
-                              mt: 1
-                            }}
-                          />
-                          <Box>{carHunter.name}</Box>
-                          <Box>{`${carHunter.city.name} - ${carHunter.city.ufCode}`}</Box>
+                    <Grid item xs={10}>
+                        <Box sx={{p: 2}}>
+                            {carHunters && carHunters.length === 0 ? (
+                                <Typography variant="h6" align="center">
+                                    Nenhum resultado encontrado
+                                </Typography>
+                            ) : (
+                                <Grid container spacing={2} sx={{minHeight: "65vh"}}>
+                                    {carHunters &&
+                                        carHunters.map((carHunter) => (
+                                            <Grid item xs={2} key={carHunter.externalId}>
+                                                <Box
+                                                    sx={{
+                                                        maxHeight: 260,
+                                                        minHeight: 260,
+                                                        bgcolor: "grey.500",
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        mb: 1,
+                                                    }}
+                                                >
+                                                    <Avatar
+                                                        src={carHunter.logoUrl}
+                                                        alt="Profile Picture"
+                                                        sx={{
+                                                            width: 150,
+                                                            height: 150,
+                                                            cursor: "pointer",
+                                                            mb: 1,
+                                                            mt: 1,
+                                                        }}
+                                                    />
+                                                    <Typography align="center">{carHunter.tradingName}</Typography>
+                                                    <Typography
+                                                        align="center">{`${carHunter.city.name} - ${carHunter.city.ufCode}`}</Typography>
+                                                </Box>
+                                                <Button variant="contained" fullWidth
+                                                        onClick={() => handleMoreInfoClick(carHunter.externalId)}>
+                                                    Mais informações
+                                                </Button>
+                                            </Grid>
+                                        ))}
+                                </Grid>
+                            )}
                         </Box>
-                        <Button
-                          variant='contained'
-                          fullWidth
-                          onClick={() =>
-                            handleMoreInfoClick(carHunter.externalId)
-                          }
-                        >
-                          Mais informações
-                        </Button>
-                      </Grid>
-                    ))}
+                        <Box sx={{display: "flex", justifyContent: "center", mt: "auto"}}>
+                            <Pagination
+                                variant="outlined"
+                                shape="rounded"
+                                count={totalPages}
+                                page={filters.page + 1}
+                                onChange={(event, page) => setCurrentPage(event, page)}
+                            />
+                        </Box>
+                    </Grid>
                 </Grid>
-              </>
-            )}
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <Pagination
-                count={5}
-                page={currentPage}
-                onChange={(event, page) => setCurrentPage(page)}
-              />
             </Box>
-          </Box>
-        </Box>
-      </Container>
-    </Paper>
-  )
+        </Paper>
+    );
 }

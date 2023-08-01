@@ -1,60 +1,41 @@
-import { Container, Paper } from '@mui/material'
-import { parseCookies } from 'nookies'
+import {Container, Paper} from '@mui/material'
 
 import Header from '../../components/Header'
 import DashBoardTable from '../../components/DashboardTable'
 import PageTitle from '../../components/PageTitle'
+import {getUserToken} from "../../services/utils/AuthUtils";
+import {fetchPaginatedCarhunters} from "../../services/actions/fetchCarhunter";
 
-export default function Dashboard () {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+export default function Dashboard() {
+    const links = [
+        {name: 'Página Inicial', url: '/'},
+        {name: 'Dashboard - Lista Consultores', url: '/admin/dashboard'},
+    ]
 
-  const fetchData = async (
-    page,
-    sort,
-    order,
-    rowsPerPage,
-    status,
-    cityId,
-    name,
-    tradingName
-  ) => {
-    const response = await fetch(
-      `${apiUrl}/car-hunters?pageNo=${page}&sortBy=${sort}&sortOrder=${order}&pageSize=${rowsPerPage}&status=${status}&cityId=${cityId}&name=${name}&tradingName=${tradingName}`
+    return (
+        <Paper sx={{height: '100vh'}}>
+            <PageTitle label={'Painel Principal - Dashboard'}/>
+            <Header logoUrlRedirect={'/admin/dashboard'} links={links}/>
+
+            <Container>
+                <DashBoardTable fetchData={fetchPaginatedCarhunters}/>
+            </Container>
+        </Paper>
     )
-
-    const data = await response.json()
-    return {
-      data: data.content,
-      total: data.totalElements
-    }
-  }
-
-  return (
-    <Paper sx={{ height: '100vh' }}>
-      <PageTitle label={'Painel Principal - Dashboard'} />
-      <Header title={'Painel Principal - Dashboard'} />
-
-      <Container>
-        <DashBoardTable fetchData={fetchData} />
-      </Container>
-    </Paper>
-  )
 }
 
 export const getServerSideProps = async ctx => {
-  const cookies = parseCookies(ctx)
-  const token = cookies.token
+    const userToken = getUserToken(ctx)
 
-  if (!token) {
-    return {
-      redirect: {
-        destination: '/auth/login',
-        permanent: false
-      }
+    if (!userToken) {
+        return {
+            redirect: {
+                destination: '/auth/login', permanent: false
+            }
+        }
     }
-  }
 
-  return {
-    props: {}
-  }
+    return {
+        props: {}
+    }
 }
