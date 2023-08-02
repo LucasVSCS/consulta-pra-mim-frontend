@@ -21,7 +21,20 @@ export const fetchPaginatedCarhunters = async (page, sort, order, rowsPerPage, s
 
 export const fetchIndexCarhunters = async (filters) => {
     const cityId = filters.city === undefined || filters.city === null ? '' : filters.city.id
+    let query = `${apiUrl}/car-hunters?pageNo=${filters.page}&pageSize=${filters.rowsPerPage}`
+    if (filters.status) query += `&status=${filters.status}`
+    if (cityId) query += `&cityId=${cityId}`
+    if (filters.name) query += `&name=${filters.name}`
+    if (filters.tradingName) query += `&tradingName=${filters.tradingName}`
+    if (filters.serviceRange.searchRadius) query += `&searchRadius=${filters.serviceRange.searchRadius}`
+    if (filters.serviceRange.priceMin) query += `&priceMin=${filters.serviceRange.priceMin}`
+    if (filters.serviceRange.priceMax) query += `&priceMax=${filters.serviceRange.priceMax}`
+    if (filters.serviceRange.yearMin) query += `&yearMin=${filters.serviceRange.yearMin}`
+    if (filters.serviceRange.yearMax) query += `&yearMax=${filters.serviceRange.yearMax}`
+    if (filters.serviceRange.brandNew) query += `&brandNew=${filters.serviceRange.brandNew}`
+    if (filters.serviceDescriptions) query += `&serviceDescriptions=${filters.serviceDescriptions}`
 
-    const response = await fetch(`${apiUrl}/car-hunters?pageNo=${filters.page}&pageSize=${filters.rowsPerPage}&status=${filters.status}&cityId=${cityId}&name=${filters.name}&tradingName=${filters.tradingName}`)
+    const response = await fetch(query)
     return await response.json()
 }
+
