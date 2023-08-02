@@ -7,9 +7,7 @@ import SearchFilters from "../../components/indexCarHunterPage/SearchFilters";
 
 export default function CarHunterSearchPage() {
     const router = useRouter()
-    const [carHunters, setCarHunters] = useState([])
-    const [totalPages, setTotalPages] = useState(0)
-    const [filters, setFilters] = useState({
+    const initialFilters = {
         status: '',
         city: '',
         name: '',
@@ -18,7 +16,11 @@ export default function CarHunterSearchPage() {
         serviceDescriptions: '',
         page: 0,
         rowsPerPage: 12
-    })
+    }
+
+    const [carHunters, setCarHunters] = useState([])
+    const [totalPages, setTotalPages] = useState(0)
+    const [filters, setFilters] = useState(initialFilters)
 
     const setCurrentPage = (event, value) => {
         setFilters({...filters, page: --value})
@@ -26,6 +28,10 @@ export default function CarHunterSearchPage() {
 
     const handleMoreInfoClick = carHunterId => {
         router.push(`/car-hunter/${carHunterId}`)
+    }
+
+    const handleReset = () => {
+        setFilters(initialFilters);
     }
 
     const links = [{name: 'Pesquisar Consultores', url: ''}, {name: 'Torne-se um Consultor', url: '/car-hunter/signup'}]
@@ -44,6 +50,7 @@ export default function CarHunterSearchPage() {
                             setFilters={setFilters}
                             setTotalPages={setTotalPages}
                             setCarHunters={setCarHunters}
+                            handleReset={handleReset}
                         />
                     </Grid>
 

@@ -1,10 +1,25 @@
-import {Box, Button, Checkbox, FormControlLabel, Grid, TextField, Typography} from "@mui/material";
+import {
+    Box,
+    Button,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
+} from "@mui/material";
 import CityInput from "../CityInput";
 import {useEffect} from "react";
 import {fetchCity} from "../../services/actions/fetchCity";
 import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
 
-export default function SearchFilters({city, filters, setFilters, setTotalPages, setCarHunters, handleSearchClick}) {
+export default function SearchFilters({city, filters, setFilters, setTotalPages, setCarHunters, handleSearchClick, handleReset}) {
+    const currentYear = new Date().getFullYear() + 1;
+    const years = Array.from({length: currentYear - 1949}, (_, i) => 1950 + i);
+
     useEffect(() => {
         if (city) {
             fetchCity(city).then((result) => {
@@ -108,30 +123,45 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                         />
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField
-                            size="small"
-                            label="Ano minimo"
-                            value={filters.serviceRange.yearMin}
-                            onChange={(event) => {
-                                const newFilters = {...filters};
-                                newFilters.serviceRange = {...newFilters.serviceRange};
-                                newFilters.serviceRange.yearMin = event.target.value;
-                                setFilters(newFilters);
-                            }}
-                        />
+                        <FormControl size="small" style={{width: '100%'}}>
+                            <InputLabel>Ano mínimo</InputLabel>
+                            <Select
+                                value={filters.serviceRange.yearMin}
+                                onChange={(event) => {
+                                    const newFilters = {...filters};
+                                    newFilters.serviceRange = {...newFilters.serviceRange};
+                                    newFilters.serviceRange.yearMin = event.target.value;
+                                    setFilters(newFilters);
+                                }}
+                            >
+                                {years.map((year) => (
+                                    <MenuItem key={year} value={year}>
+                                        {year}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField
-                            size="small"
-                            label="Ano maximo"
-                            value={filters.serviceRange.yearMax}
-                            onChange={(event) => {
-                                const newFilters = {...filters};
-                                newFilters.serviceRange = {...newFilters.serviceRange};
-                                newFilters.serviceRange.yearMax = event.target.value;
-                                setFilters(newFilters);
-                            }}
-                        />
+                        <FormControl size="small" style={{width: '100%'}}>
+                            <InputLabel>Ano máximo</InputLabel>
+                            <Select
+                                value={filters.serviceRange.yearMax}
+                                onChange={(event) => {
+                                    const newFilters = {...filters};
+                                    newFilters.serviceRange = {...newFilters.serviceRange};
+                                    newFilters.serviceRange.yearMax = event.target.value;
+                                    newFilters.serviceRange.brandNew = false;
+                                    setFilters(newFilters);
+                                }}
+                            >
+                                {years.map((year) => (
+                                    <MenuItem key={year} value={year}>
+                                        {year}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <FormControlLabel
                             control={
                                 <Checkbox
@@ -140,6 +170,9 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                                         const newFilters = {...filters};
                                         newFilters.serviceRange = {...newFilters.serviceRange};
                                         newFilters.serviceRange.brandNew = event.target.checked;
+                                        if (event.target.checked) {
+                                            newFilters.serviceRange.yearMax = '';
+                                        }
                                         setFilters(newFilters);
                                     }}
                                 />
@@ -166,6 +199,10 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
 
                 <Button fullWidth variant='contained' onClick={handleSearchClick} sx={{mt: 2}}>
                     Pesquisar
+                </Button>
+
+                <Button fullWidth onClick={handleReset} sx={{mt: 1}}>
+                    Limpar filtros
                 </Button>
             </Box>
         </>
