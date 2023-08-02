@@ -20,8 +20,8 @@ export const fetchPaginatedCarhunters = async (page, sort, order, rowsPerPage, s
 }
 
 export const fetchIndexCarhunters = async (filters) => {
-    const response = await fetch(
-        `${apiUrl}/car-hunters?pageNo=${filters.page}&pageSize=${filters.rowsPerPage}&status=${filters.status}&cityId=${filters.cityId}&name=${filters.name}&tradingName=${filters.tradingName}`
-    )
+    const cityId = filters.city === undefined || filters.city === null ? '' : filters.city.id
+
+    const response = await fetch(`${apiUrl}/car-hunters?pageNo=${filters.page}&pageSize=${filters.rowsPerPage}&status=${filters.status}&cityId=${cityId}&name=${filters.name}&tradingName=${filters.tradingName}`)
     return await response.json()
 }

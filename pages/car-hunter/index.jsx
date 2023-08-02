@@ -4,7 +4,8 @@ import {useEffect, useState} from 'react'
 import PageTitle from '../../components/PageTitle'
 import {useRouter} from 'next/router'
 import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
-import SearchFilters from "../../components/indexCarHunterPage/searchFilters";
+import SearchFilters from "../../components/indexCarHunterPage/SearchFilters";
+import {fetchCity} from "../../services/actions/fetchCity";
 
 export default function CarHunterSearchPage() {
     const router = useRouter()
@@ -13,7 +14,7 @@ export default function CarHunterSearchPage() {
 
     const [filters, setFilters] = useState({
         status: '',
-        cityId: '',
+        city: '',
         name: '',
         tradingName: '',
         page: 0,
@@ -21,14 +22,24 @@ export default function CarHunterSearchPage() {
     })
 
     useEffect(() => {
-        fetchIndexCarhunters(filters).then(result => {
-            setTotalPages(result.totalPages)
-            setCarHunters(result.content)
-        })
-    }, [router.query.cityId, filters.page, filters.status, filters.cityId, filters.name, filters.tradingName])
+        if (router.query.cityId) {
+            fetchCity(router.query.cityId).then((result) => {
+                setFilters((prevFilters) => ({
+                    ...prevFilters,
+                    city: result,
+                }));
+            })
+        }
+    }, [router.query.cityId]);
+
+    useEffect(() => {
+        fetchIndexCarhunters(filters).then((result) => {
+            setTotalPages(result.totalPages);
+            setCarHunters(result.content);
+        });
+    }, [filters.page, filters.status, filters.city, filters.name, filters.tradingName]);
 
     const setCurrentPage = (event, value) => {
-        console.log(value)
         setFilters({...filters, page: --value})
     }
 
@@ -36,21 +47,17 @@ export default function CarHunterSearchPage() {
         router.push(`/car-hunter/${carHunterId}`)
     }
 
-    const links = [{name: 'Pesquisar Consultores', url: '#'}, {
-        name: 'Torne-se um Consultor', url: '/car-hunter/signup'
-    }]
+    const links = [
+        {name: 'Pesquisar Consultores', url: ''},
+        {name: 'Torne-se um Consultor', url: '/car-hunter/signup'}
+    ]
 
     return (
         <Paper sx={{height: "100vh", overflowY: "hidden"}}>
             <PageTitle label={"Pesquisar Consultores"}/>
             <Header logoUrlRedirect={"/"} links={links} isUserLogged={false}/>
 
-            <Box sx={{
-                display: "flex",
-                padding: 2,
-                height: "100%",
-                boxSizing: "border-box"
-            }}>
+            <Box sx={{display: "flex", padding: 2, height: "100%", boxSizing: "border-box"}}>
                 <Grid container>
                     <Grid item xs={2}>
                         <SearchFilters filters={filters} setFilters={setFilters}/>
@@ -59,9 +66,7 @@ export default function CarHunterSearchPage() {
                     <Grid item xs={10}>
                         <Box sx={{p: 2}}>
                             {carHunters && carHunters.length === 0 ? (
-                                <Typography variant="h6" align="center">
-                                    Nenhum resultado encontrado
-                                </Typography>
+                                <Typography variant="h6" align="center">Nenhum resultado encontrado</Typography>
                             ) : (
                                 <Grid container spacing={2} sx={{minHeight: "65vh"}}>
                                     {carHunters &&
@@ -82,13 +87,7 @@ export default function CarHunterSearchPage() {
                                                     <Avatar
                                                         src={carHunter.logoUrl}
                                                         alt="Profile Picture"
-                                                        sx={{
-                                                            width: 150,
-                                                            height: 150,
-                                                            cursor: "pointer",
-                                                            mb: 1,
-                                                            mt: 1,
-                                                        }}
+                                                        sx={{width: 150, height: 150, cursor: "pointer", mb: 1, mt: 1}}
                                                     />
                                                     <Typography align="center">{carHunter.tradingName}</Typography>
                                                     <Typography
@@ -104,12 +103,8 @@ export default function CarHunterSearchPage() {
                             )}
                         </Box>
                         <Box sx={{display: "flex", justifyContent: "center", mt: "auto"}}>
-                            <Pagination
-                                variant="outlined"
-                                shape="rounded"
-                                count={totalPages}
-                                page={filters.page + 1}
-                                onChange={(event, page) => setCurrentPage(event, page)}
+                            <Pagination variant="outlined" shape="rounded" count={totalPages} page={filters.page + 1}
+                                        onChange={(event, page) => setCurrentPage(event, page)}
                             />
                         </Box>
                     </Grid>
