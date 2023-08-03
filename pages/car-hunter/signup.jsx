@@ -17,8 +17,8 @@ export default function CarHunterRegistrationPage () {
     top: 0,
     left: 0,
     mb: 2,
-    width: 250,
-    height: 100
+    width: 220,
+    height: 110
   }
 
   const propsBackgrounImage = {

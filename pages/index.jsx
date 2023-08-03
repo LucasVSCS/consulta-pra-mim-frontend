@@ -15,8 +15,8 @@ export default function HomePage () {
 
   const propsLogo = {
     mb: 2,
-    width: 250,
-    height: 100
+    width: 220,
+    height: 110
   }
 
   const propsBackgrounImage = { flex: 1, position: 'relative' }

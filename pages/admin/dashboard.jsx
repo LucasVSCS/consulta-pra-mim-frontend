@@ -26,8 +26,6 @@ export default function Dashboard({userName}) {
 
 export const getServerSideProps = async ctx => {
     const userToken = getUserToken(ctx)
-    const payload = userToken.split('.')[1];
-    const userName = JSON.parse(atob(payload)).sub;
 
     if (!userToken) {
         return {
@@ -36,6 +34,9 @@ export const getServerSideProps = async ctx => {
             }
         }
     }
+
+    const payload = userToken.split('.')[1];
+    const userName = JSON.parse(atob(payload)).sub;
 
     return {
         props: {

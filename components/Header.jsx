@@ -11,7 +11,7 @@ export default function Header({userName = '', logoUrlRedirect, links, isUserLog
     const router = useRouter()
 
     const propsLogo = {
-        cursor: 'pointer', width: 130, height: 50
+        cursor: 'pointer', width: 130, height: 70
     }
 
     const handleMenu = event => {
