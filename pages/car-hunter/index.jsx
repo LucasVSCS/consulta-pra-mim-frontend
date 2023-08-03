@@ -74,7 +74,7 @@ export default function CarHunterSearchPage() {
                                                 }}
                                             >
                                                 <Avatar
-                                                    src={`data:image/png;base64,${carHunter.logoUrl}`}
+                                                    src={carHunter.logoUrl}
                                                     alt="Profile Picture"
                                                     sx={{width: 150, height: 150, cursor: "pointer", mb: 1, mt: 1}}
                                                 />
