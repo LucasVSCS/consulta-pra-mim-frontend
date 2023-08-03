@@ -8,7 +8,7 @@ import SearchFilters from "../../components/indexCarHunterPage/SearchFilters";
 export default function CarHunterSearchPage() {
     const router = useRouter()
     const initialFilters = {
-        status: '',
+        status: 1,
         city: '',
         name: '',
         tradingName: '',
@@ -74,7 +74,7 @@ export default function CarHunterSearchPage() {
                                                 }}
                                             >
                                                 <Avatar
-                                                    src={carHunter.logoUrl}
+                                                    src={`data:image/png;base64,${carHunter.logoUrl}`}
                                                     alt="Profile Picture"
                                                     sx={{width: 150, height: 150, cursor: "pointer", mb: 1, mt: 1}}
                                                 />

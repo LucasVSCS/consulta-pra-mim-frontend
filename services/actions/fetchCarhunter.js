@@ -27,14 +27,13 @@ export const fetchIndexCarhunters = async (filters) => {
     if (filters.name) query += `&name=${filters.name}`
     if (filters.tradingName) query += `&tradingName=${filters.tradingName}`
     if (filters.serviceRange.searchRadius) query += `&searchRadius=${filters.serviceRange.searchRadius}`
-    if (filters.serviceRange.priceMin) query += `&priceMin=${filters.serviceRange.priceMin}`
-    if (filters.serviceRange.priceMax) query += `&priceMax=${filters.serviceRange.priceMax}`
+    if (filters.serviceRange.priceMin) query += `&priceMin=${filters.serviceRange.priceMin.split(',')[0].replace(/\D/g, '')}`
+    if (filters.serviceRange.priceMax) query += `&priceMax=${filters.serviceRange.priceMax.split(',')[0].replace(/\D/g, '')}`
     if (filters.serviceRange.yearMin) query += `&yearMin=${filters.serviceRange.yearMin}`
     if (filters.serviceRange.yearMax) query += `&yearMax=${filters.serviceRange.yearMax}`
     if (filters.serviceRange.brandNew) query += `&brandNew=${filters.serviceRange.brandNew}`
-    if (filters.serviceDescriptions) query += `&serviceDescriptions=${filters.serviceDescriptions}`
+    if (filters.serviceDescriptions) query += `&serviceDescription=${filters.serviceDescriptions}`
 
     const response = await fetch(query)
     return await response.json()
 }
-

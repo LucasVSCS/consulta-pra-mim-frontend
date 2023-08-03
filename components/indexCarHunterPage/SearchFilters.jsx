@@ -5,8 +5,10 @@ import {
     FormControl,
     FormControlLabel,
     Grid,
+    InputAdornment,
     InputLabel,
     MenuItem,
+    OutlinedInput,
     Select,
     TextField,
     Typography
@@ -15,8 +17,9 @@ import CityInput from "../CityInput";
 import {useEffect} from "react";
 import {fetchCity} from "../../services/actions/fetchCity";
 import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
+import {NumericFormat} from "react-number-format";
 
-export default function SearchFilters({city, filters, setFilters, setTotalPages, setCarHunters, handleSearchClick, handleReset}) {
+export default function SearchFilters({city, filters, setFilters, setTotalPages, setCarHunters, handleReset}) {
     const currentYear = new Date().getFullYear() + 1;
     const years = Array.from({length: currentYear - 1949}, (_, i) => 1950 + i);
 
@@ -25,30 +28,22 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
             fetchCity(city).then((result) => {
                 setFilters((prevFilters) => ({
                     ...prevFilters, city: result,
-                }));
+                }))
             })
+
         }
     }, [city]);
 
-    useEffect(() => {
+    const handleSearch = () => {
         fetchIndexCarhunters(filters).then((result) => {
             setTotalPages(result.totalPages);
             setCarHunters(result.content);
         });
-    }, [
-        filters.page,
-        filters.status,
-        filters.city,
-        filters.name,
-        filters.tradingName,
-        filters.serviceRange.searchRadius,
-        filters.serviceRange.priceMin,
-        filters.serviceRange.priceMax,
-        filters.serviceRange.yearMin,
-        filters.serviceRange.yearMax,
-        filters.serviceRange.brandNew,
-        filters.serviceDescriptions,
-    ]);
+    }
+
+    useEffect(() => {
+        handleSearch()
+    }, [filters.city]);
 
     return (
         <>
@@ -77,54 +72,70 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <CityInput
-                            value={filters.city}
-                            onChange={(event, newValue) => setFilters({...filters, city: newValue})}
-                        />
+                        <CityInput value={filters.city}
+                                   onChange={(event, newValue) => setFilters({...filters, city: newValue})}/>
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField
+                        <FormControl>
+                            <InputLabel size={'small'} sx={{mb: 1}}>Área de cobertura</InputLabel>
+                            <OutlinedInput
+                                fullWidth
+                                label={'Área de cobertura'}
+                                size='small'
+                                value={filters.serviceRange.searchRadius}
+                                onChange={(event) => {
+                                    const newFilters = {...filters};
+                                    newFilters.serviceRange = {...newFilters.serviceRange};
+                                    newFilters.serviceRange.searchRadius = event.target.value;
+                                    setFilters(newFilters);
+                                }}
+                                endAdornment={<InputAdornment position='end'>km</InputAdornment>}
+                            />
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <NumericFormat
                             size='small'
-                            label='Área de cobertura'
-                            fullWidth
-                            value={filters.serviceRange.searchRadius}
-                            onChange={(event) => {
-                                const newFilters = {...filters};
-                                newFilters.serviceRange = {...newFilters.serviceRange};
-                                newFilters.serviceRange.searchRadius = event.target.value;
-                                setFilters(newFilters);
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <TextField
-                            size="small"
-                            label="Preço minimo"
+                            label='Preço mínimo'
                             value={filters.serviceRange.priceMin}
-                            onChange={(event) => {
+                            onChange={(values) => {
                                 const newFilters = {...filters};
                                 newFilters.serviceRange = {...newFilters.serviceRange};
-                                newFilters.serviceRange.priceMin = event.target.value;
+                                newFilters.serviceRange.priceMin = values.target.value;
                                 setFilters(newFilters);
                             }}
+                            customInput={TextField}
+                            thousandSeparator='.'
+                            prefix={'R$'}
+                            suffix=',00'
+                            decimalSeparator=','
+                            placeholder='R$'
+                            fixedDecimalScale={true}
                         />
                     </Grid>
                     <Grid item xs={6}>
-                        <TextField
-                            size="small"
-                            label="Preço máximo"
+                        <NumericFormat
+                            size='small'
+                            label='Preço máximo'
                             value={filters.serviceRange.priceMax}
-                            onChange={(event) => {
+                            onChange={(values) => {
                                 const newFilters = {...filters};
                                 newFilters.serviceRange = {...newFilters.serviceRange};
-                                newFilters.serviceRange.priceMax = event.target.value;
+                                newFilters.serviceRange.priceMax = values.target.value;
                                 setFilters(newFilters);
                             }}
+                            customInput={TextField}
+                            thousandSeparator='.'
+                            prefix={'R$'}
+                            suffix=',00'
+                            decimalSeparator=','
+                            placeholder='R$'
+                            fixedDecimalScale={true}
                         />
                     </Grid>
                     <Grid item xs={6}>
-                        <FormControl size="small" style={{width: '100%'}}>
-                            <InputLabel>Ano mínimo</InputLabel>
+                        <FormControl size='small' style={{width: '100%'}}>
+                            <InputLabel>Do ano</InputLabel>
                             <Select
                                 value={filters.serviceRange.yearMin}
                                 onChange={(event) => {
@@ -132,6 +143,22 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                                     newFilters.serviceRange = {...newFilters.serviceRange};
                                     newFilters.serviceRange.yearMin = event.target.value;
                                     setFilters(newFilters);
+                                }}
+                                MenuProps={{
+                                    anchorOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    },
+                                    transformOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    },
+                                    getContentAnchorEl: null,
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 48 * 4.5,
+                                        },
+                                    },
                                 }}
                             >
                                 {years.map((year) => (
@@ -144,7 +171,7 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                     </Grid>
                     <Grid item xs={6}>
                         <FormControl size="small" style={{width: '100%'}}>
-                            <InputLabel>Ano máximo</InputLabel>
+                            <InputLabel>Até ano</InputLabel>
                             <Select
                                 value={filters.serviceRange.yearMax}
                                 onChange={(event) => {
@@ -153,6 +180,22 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                                     newFilters.serviceRange.yearMax = event.target.value;
                                     newFilters.serviceRange.brandNew = false;
                                     setFilters(newFilters);
+                                }}
+                                MenuProps={{
+                                    anchorOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    },
+                                    transformOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    },
+                                    getContentAnchorEl: null,
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 48 * 4.5,
+                                        },
+                                    },
                                 }}
                             >
                                 {years.map((year) => (
@@ -197,7 +240,7 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                     </Grid>
                 </Grid>
 
-                <Button fullWidth variant='contained' onClick={handleSearchClick} sx={{mt: 2}}>
+                <Button fullWidth variant='contained' onClick={handleSearch} sx={{mt: 2}}>
                     Pesquisar
                 </Button>
 
