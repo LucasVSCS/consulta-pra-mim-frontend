@@ -43,7 +43,7 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
 
     useEffect(() => {
         handleSearch()
-    }, [filters.city]);
+    }, [filters.city, filters.page]);
 
     return (
         <>

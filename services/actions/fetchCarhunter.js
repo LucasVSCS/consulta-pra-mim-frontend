@@ -31,7 +31,7 @@ export const fetchIndexCarhunters = async (filters) => {
     if (filters.serviceRange.priceMax) query += `&priceMax=${filters.serviceRange.priceMax.split(',')[0].replace(/\D/g, '')}`
     if (filters.serviceRange.yearMin) query += `&yearMin=${filters.serviceRange.yearMin}`
     if (filters.serviceRange.yearMax) query += `&yearMax=${filters.serviceRange.yearMax}`
-    if (filters.serviceRange.brandNew) query += `&brandNew=${filters.serviceRange.brandNew}`
+    if (filters.serviceRange.brandNew) query += '&brandNew=1'
     if (filters.serviceDescriptions) query += `&serviceDescription=${filters.serviceDescriptions}`
 
     const response = await fetch(query)

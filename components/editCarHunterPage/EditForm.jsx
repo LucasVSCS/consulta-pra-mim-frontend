@@ -27,7 +27,6 @@ export default function EditForm() {
     const router = useRouter()
     const {externalId} = router.query
     const [carHunterData, setCarHunterData] = useState({})
-    const [profilePicture, setProfilePicture] = useState(null)
     const [phones, setPhones] = useState([{}, {}])
     const [phone, setPhone] = useState('')
     const [selectedCity, setSelectedCity] = useState(null)
@@ -53,7 +52,6 @@ export default function EditForm() {
 
             updateCarhunter(externalId, values, token).then((response) => {
                 if (response.success) {
-                    router.push('/admin/dashboard')
                     return enqueueSnackbar(`Sucesso ao editar o consultor - ${carHunterData.name}`, {
                         variant: 'success',
                         anchorOrigin: {
@@ -80,6 +78,7 @@ export default function EditForm() {
             tradingName: carHunterData.tradingName || '',
             email: carHunterData.email || '',
             cityId: carHunterData.city ? carHunterData.city.id : '',
+            logoImage: carHunterData.logoUrl || '',
             serviceDescription: carHunterData.serviceDescription || '',
             isActive: carHunterData.isActive || false,
             phones: carHunterData.phones || [],
@@ -111,10 +110,6 @@ export default function EditForm() {
     }, [selectedCity])
 
     useEffect(() => {
-        setProfilePicture(carHunterData.logoUrl)
-    }, [carHunterData.logoUrl])
-
-    useEffect(() => {
         if (carHunterData.phones && carHunterData.phones.length) {
             setPhones(carHunterData.phones)
         }
@@ -131,7 +126,11 @@ export default function EditForm() {
     const handleProfilePictureChange = event => {
         if (event.target.files && event.target.files[0]) {
             const reader = new FileReader()
-            reader.onload = e => setProfilePicture(e.target.result)
+            reader.onload = e => setCarHunterData(prevCarHunterData => {
+                const newCarHunterData = {...prevCarHunterData}
+                newCarHunterData.logoUrl = e.target.result
+                return newCarHunterData
+            })
             reader.readAsDataURL(event.target.files[0])
         }
     }
@@ -156,6 +155,7 @@ export default function EditForm() {
                         </Typography>
                         <Box display='flex' justifyContent='center' alignItems='center'>
                             <input
+                                name='logoImage'
                                 type='file'
                                 accept='image/*'
                                 onChange={handleProfilePictureChange}
@@ -164,7 +164,7 @@ export default function EditForm() {
                             />
                             <label htmlFor='profile-picture-input'>
                                 <Avatar
-                                    src={profilePicture}
+                                    src={carHunterData.logoUrl}
                                     alt='Profile Picture'
                                     sx={{width: 100, height: 100, cursor: 'pointer'}}
                                 />
@@ -320,7 +320,7 @@ export default function EditForm() {
                     <Grid item xs>
                         <TextField
                             fullWidth
-                            label='Ano mínimo'
+                            label='Do ano'
                             size='small'
                             value={formik.values.serviceRange.yearMin}
                             onChange={formik.handleChange}
@@ -333,7 +333,7 @@ export default function EditForm() {
                     <Grid item xs>
                         <TextField
                             fullWidth
-                            label='Ano máximo'
+                            label='Até ano'
                             size='small'
                             value={formik.values.serviceRange.yearMax}
                             onChange={formik.handleChange}
