@@ -3,16 +3,20 @@ import {
     Box,
     Button,
     Checkbox,
+    FormControl,
     FormControlLabel,
     FormHelperText,
     Grid,
     InputAdornment,
+    InputLabel,
+    MenuItem,
     OutlinedInput,
+    Select,
     TextField,
     Typography
 } from "@mui/material";
 import CityInput from "../CityInput";
-import {PatternFormat} from "react-number-format";
+import {NumericFormat, PatternFormat} from "react-number-format";
 import {formatPhoneNumber, handlePhoneChange, handleWhatsAppChange} from "../../services/utils/PhoneUtils";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
@@ -25,6 +29,8 @@ import {enqueueSnackbar} from "notistack";
 
 export default function EditForm() {
     const router = useRouter()
+    const currentYear = new Date().getFullYear() + 1;
+    const years = Array.from({length: currentYear - 1949}, (_, i) => 1950 + i);
     const {externalId} = router.query
     const [carHunterData, setCarHunterData] = useState({})
     const [phones, setPhones] = useState([{}, {}])
@@ -50,7 +56,16 @@ export default function EditForm() {
             const cookies = parseCookies();
             const token = cookies.token;
 
-            updateCarhunter(externalId, values, token).then((response) => {
+            const formattedValues = {
+                ...values,
+                serviceRange: {
+                    ...values.serviceRange,
+                    priceMin: values.serviceRange.priceMin ? values.serviceRange.priceMin.replace(/\D/g, '') : '',
+                    priceMax: values.serviceRange.priceMax ? values.serviceRange.priceMax.replace(/\D/g, '') : '',
+                }
+            }
+
+            updateCarhunter(externalId, formattedValues, token).then((response) => {
                 if (response.success) {
                     return enqueueSnackbar(`Sucesso ao editar o consultor - ${carHunterData.name}`, {
                         variant: 'success',
@@ -318,31 +333,71 @@ export default function EditForm() {
                         <FormHelperText>Área de cobertura</FormHelperText>
                     </Grid>
                     <Grid item xs>
-                        <TextField
-                            fullWidth
-                            label='Do ano'
-                            size='small'
-                            value={formik.values.serviceRange.yearMin}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.serviceRange && formik.touched.serviceRange.yearMin && formik.errors.serviceRange && formik.errors.serviceRange.yearMin}
-                            name='serviceRange.yearMin'
-                            InputLabelProps={{shrink: true}}
-                        />
+                        <FormControl size='small' style={{width: '100%'}}>
+                            <InputLabel>Do ano</InputLabel>
+                            <Select
+                                value={formik.values.serviceRange.yearMin}
+                                onChange={formik.handleChange}
+                                name='serviceRange.yearMin'
+                                InputLabelProps={{shrink: true}}
+                                MenuProps={{
+                                    anchorOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    },
+                                    transformOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    },
+                                    getContentAnchorEl: null,
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 48 * 4.5,
+                                        },
+                                    },
+                                }}
+                            >
+                                {years.map((year) => (
+                                    <MenuItem key={year} value={year}>
+                                        {year}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Grid>
                     <Grid item xs>
-                        <TextField
-                            fullWidth
-                            label='Até ano'
-                            size='small'
-                            value={formik.values.serviceRange.yearMax}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.serviceRange && formik.touched.serviceRange.yearMax && formik.errors.serviceRange && formik.errors.serviceRange.yearMax}
-                            disabled={formik.values.serviceRange.brandNew}
-                            name='serviceRange.yearMax'
-                            InputLabelProps={{shrink: true}}
-                        />
+                        <FormControl size="small" style={{width: '100%'}}>
+                            <InputLabel>Até ano</InputLabel>
+                            <Select
+                                value={formik.values.serviceRange.yearMax}
+                                onChange={formik.handleChange}
+                                disabled={formik.values.serviceRange.brandNew}
+                                name='serviceRange.yearMax'
+                                InputLabelProps={{shrink: true}}
+                                MenuProps={{
+                                    anchorOrigin: {
+                                        vertical: 'bottom',
+                                        horizontal: 'left',
+                                    },
+                                    transformOrigin: {
+                                        vertical: 'top',
+                                        horizontal: 'left',
+                                    },
+                                    getContentAnchorEl: null,
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 48 * 4.5,
+                                        },
+                                    },
+                                }}
+                            >
+                                {years.map((year) => (
+                                    <MenuItem key={year} value={year}>
+                                        {year}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                         <FormControlLabel
                             control={<Checkbox
                                 checked={formik.values.serviceRange.brandNew || false}
@@ -353,29 +408,39 @@ export default function EditForm() {
                         />
                     </Grid>
                     <Grid item xs>
-                        <TextField
+                        <NumericFormat
                             fullWidth
-                            label='Preço mínimo'
                             size='small'
+                            label='Preço mínimo'
                             value={formik.values.serviceRange.priceMin}
                             onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.serviceRange && formik.touched.serviceRange.priceMin && formik.errors.serviceRange && formik.errors.serviceRange.priceMin}
-                            name='serviceRange.priceMin'
+                            customInput={TextField}
+                            thousandSeparator='.'
+                            prefix={'R$'}
+                            suffix=''
+                            decimalSeparator=','
+                            placeholder='R$'
+                            fixedDecimalScale={true}
                             InputLabelProps={{shrink: true}}
+                            name='serviceRange.priceMin'
                         />
                     </Grid>
                     <Grid item xs>
-                        <TextField
+                        <NumericFormat
                             fullWidth
-                            label='Preço máximo'
                             size='small'
+                            label='Preço máximo'
                             value={formik.values.serviceRange.priceMax}
                             onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched.serviceRange && formik.touched.serviceRange.priceMax && formik.errors.serviceRange && formik.errors.serviceRange.priceMax}
-                            name='serviceRange.priceMax'
+                            customInput={TextField}
+                            thousandSeparator='.'
+                            prefix={'R$'}
+                            suffix=''
+                            decimalSeparator=','
+                            placeholder='R$'
+                            fixedDecimalScale={true}
                             InputLabelProps={{shrink: true}}
+                            name='serviceRange.priceMax'
                         />
                     </Grid>
                     {/* Fim inputs dos dados do serviço */}
