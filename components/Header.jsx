@@ -6,7 +6,7 @@ import LogoImage from './LogoImage'
 import {getUserToken} from "../services/utils/AuthUtils";
 import Link from "next/link";
 
-export default function Header({logoUrlRedirect, links, isUserLogged = true}) {
+export default function Header({userName = '', logoUrlRedirect, links, isUserLogged = true}) {
     const [anchorEl, setAnchorEl] = React.useState(null)
     const router = useRouter()
 
@@ -48,7 +48,7 @@ export default function Header({logoUrlRedirect, links, isUserLogged = true}) {
 
                         {isUserLogged && (
                             <>
-                                <Typography variant='h6'>Lucas Vinicius</Typography>
+                                <Typography variant='h6'>{userName}</Typography>
                                 <div>
                                     <IconButton size='large' onClick={handleMenu}>
                                         <AccountCircle/>

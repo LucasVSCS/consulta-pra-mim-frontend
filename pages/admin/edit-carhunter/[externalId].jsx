@@ -4,8 +4,9 @@ import PageTitle from '../../../components/PageTitle'
 import {getUserToken} from "../../../services/utils/AuthUtils";
 import EditForm from "../../../components/editCarHunterPage/EditForm";
 import BackButton from "../../../components/BackButton";
+import {useState} from "react";
 
-export default function EditCarHunter() {
+export default function EditCarHunter({userName}){
     const links = [
         {name: 'Página Inicial', url: '/'},
         {name: 'Dashboard - Lista Consultores', url: '/admin/dashboard'},
@@ -14,7 +15,7 @@ export default function EditCarHunter() {
     return (
         <Paper sx={{height: '100vh'}}>
             <PageTitle label={'Editar Consultor Automotivo'}/>
-            <Header logoUrlRedirect={'/admin/dashboard'} links={links}/>
+            <Header userName={userName} logoUrlRedirect={'/admin/dashboard'} links={links}/>
             <Container>
                 <Box display="flex" alignItems="center" justifyContent="space-between">
                     <BackButton sx={{mb: 2}}/>
@@ -29,6 +30,8 @@ export default function EditCarHunter() {
 
 export const getServerSideProps = async ctx => {
     const userToken = getUserToken(ctx)
+    const payload = userToken.split('.')[1];
+    const userName = JSON.parse(atob(payload)).sub;
 
     if (!userToken) {
         return {
@@ -39,6 +42,8 @@ export const getServerSideProps = async ctx => {
     }
 
     return {
-        props: {}
+        props: {
+            userName
+        }
     }
 }

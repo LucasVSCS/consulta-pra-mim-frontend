@@ -1,9 +1,11 @@
 import {Avatar, Box, Button, Grid, Pagination, Paper, Typography} from '@mui/material'
 import Header from '../../components/Header'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import PageTitle from '../../components/PageTitle'
 import {useRouter} from 'next/router'
 import SearchFilters from "../../components/indexCarHunterPage/SearchFilters";
+import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
+import {fetchCity} from "../../services/actions/fetchCity";
 
 export default function CarHunterSearchPage() {
     const router = useRouter()
@@ -31,8 +33,40 @@ export default function CarHunterSearchPage() {
     }
 
     const handleReset = () => {
-        setFilters(initialFilters);
+        setFilters(initialFilters)
+        fetchIndexCarhunters(initialFilters).then((result) => {
+            setTotalPages(result.totalPages);
+            setCarHunters(result.content);
+        });
     }
+
+    const handleSearch = () => {
+        fetchIndexCarhunters(filters).then((result) => {
+            setTotalPages(result.totalPages);
+            setCarHunters(result.content);
+        });
+    }
+
+    useEffect(() => {
+        if (router.query.cityId) {
+            fetchCity(router.query.cityId).then((result) => {
+                setFilters((prevFilters) => ({
+                    ...prevFilters, city: result,
+                }))
+            })
+
+        }
+    }, [router.query.cityId])
+
+    useEffect(() => {
+        if (router.query.cityId && filters.city) {
+            handleSearch()
+        }
+    }, [filters.city])
+
+    useEffect(() => {
+        handleSearch()
+    }, [filters.page])
 
     const links = [{name: 'Pesquisar Consultores', url: ''}, {name: 'Torne-se um Consultor', url: '/car-hunter/signup'}]
 
@@ -45,12 +79,10 @@ export default function CarHunterSearchPage() {
                 <Grid container>
                     <Grid item xs={2}>
                         <SearchFilters
-                            city={router.query.cityId}
                             filters={filters}
                             setFilters={setFilters}
-                            setTotalPages={setTotalPages}
-                            setCarHunters={setCarHunters}
                             handleReset={handleReset}
+                            handleSearch={handleSearch}
                         />
                     </Grid>
 

@@ -14,36 +14,11 @@ import {
     Typography
 } from "@mui/material";
 import CityInput from "../CityInput";
-import {useEffect} from "react";
-import {fetchCity} from "../../services/actions/fetchCity";
-import {fetchIndexCarhunters} from "../../services/actions/fetchCarhunter";
 import {NumericFormat} from "react-number-format";
 
-export default function SearchFilters({city, filters, setFilters, setTotalPages, setCarHunters, handleReset}) {
+export default function SearchFilters({filters, setFilters, handleReset, handleSearch}) {
     const currentYear = new Date().getFullYear() + 1;
     const years = Array.from({length: currentYear - 1949}, (_, i) => 1950 + i);
-
-    useEffect(() => {
-        if (city) {
-            fetchCity(city).then((result) => {
-                setFilters((prevFilters) => ({
-                    ...prevFilters, city: result,
-                }))
-            })
-
-        }
-    }, [city]);
-
-    const handleSearch = () => {
-        fetchIndexCarhunters(filters).then((result) => {
-            setTotalPages(result.totalPages);
-            setCarHunters(result.content);
-        });
-    }
-
-    useEffect(() => {
-        handleSearch()
-    }, [filters.city, filters.page]);
 
     return (
         <>
@@ -239,14 +214,8 @@ export default function SearchFilters({city, filters, setFilters, setTotalPages,
                         />
                     </Grid>
                 </Grid>
-
-                <Button fullWidth variant='contained' onClick={handleSearch} sx={{mt: 2}}>
-                    Pesquisar
-                </Button>
-
-                <Button fullWidth onClick={handleReset} sx={{mt: 1}}>
-                    Limpar filtros
-                </Button>
+                <Button fullWidth variant='contained' onClick={handleSearch} sx={{mt: 2}}>Pesquisar</Button>
+                <Button fullWidth onClick={handleReset} sx={{mt: 1}}>Limpar filtros</Button>
             </Box>
         </>
     )

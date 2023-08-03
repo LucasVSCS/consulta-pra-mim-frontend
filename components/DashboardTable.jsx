@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import {IconButton} from '@mui/material'
 import {deleteCarhunter} from '../services/actions/deleteCarhunter'
 import {useSnackbar} from 'notistack'
+import { parseCookies } from 'nookies'
 
 export default function DashboardTable({fetchData}) {
     const router = useRouter()
@@ -54,8 +55,11 @@ export default function DashboardTable({fetchData}) {
     ])
 
     const handleRemove = value => {
+        const cookies = parseCookies();
+        const token = cookies.token;
+            
         if (window.confirm('Tem certeza que deseja deletar este usuário?')) {
-            deleteCarhunter(value).then(response => {
+            deleteCarhunter(value, token).then(response => {
                 if (response.success) {
                     handleSearch(filters)
                     return enqueueSnackbar('Consultor removido com sucesso!', {

@@ -60,8 +60,8 @@ export default function EditForm() {
                 ...values,
                 serviceRange: {
                     ...values.serviceRange,
-                    priceMin: values.serviceRange.priceMin ? values.serviceRange.priceMin.replace(/\D/g, '') : '',
-                    priceMax: values.serviceRange.priceMax ? values.serviceRange.priceMax.replace(/\D/g, '') : '',
+                    priceMin: values.serviceRange.priceMin ? values.serviceRange.priceMin.toString().replace(/\D/g, '') : '',
+                    priceMax: values.serviceRange.priceMax ? values.serviceRange.priceMax.toString().replace(/\D/g, '') : '',
                 }
             }
 
@@ -215,7 +215,6 @@ export default function EditForm() {
                             error={formik.touched.email && formik.errors.email}
                             helperText={formik.touched.email && formik.errors.email}
                             name='email'
-                            InputLabelProps={{shrink: true}}
                         />
                     </Grid>
                     <Grid item xs>
@@ -231,7 +230,6 @@ export default function EditForm() {
                             error={formik.touched.tradingName && formik.errors.tradingName}
                             helperText={formik.touched.tradingName && formik.errors.tradingName}
                             name='tradingName'
-                            InputLabelProps={{shrink: true}}
                         />
                         <CityInput
                             sx={{marginTop: 2}}

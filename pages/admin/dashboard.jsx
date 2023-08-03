@@ -6,7 +6,7 @@ import PageTitle from '../../components/PageTitle'
 import {getUserToken} from "../../services/utils/AuthUtils";
 import {fetchPaginatedCarhunters} from "../../services/actions/fetchCarhunter";
 
-export default function Dashboard() {
+export default function Dashboard({userName}) {
     const links = [
         {name: 'Página Inicial', url: '/'},
         {name: 'Dashboard - Lista Consultores', url: '/admin/dashboard'},
@@ -15,7 +15,7 @@ export default function Dashboard() {
     return (
         <Paper sx={{height: '100vh'}}>
             <PageTitle label={'Painel Principal - Dashboard'}/>
-            <Header logoUrlRedirect={'/admin/dashboard'} links={links}/>
+            <Header userName={userName} logoUrlRedirect={'/admin/dashboard'} links={links}/>
 
             <Container>
                 <DashBoardTable fetchData={fetchPaginatedCarhunters}/>
@@ -26,6 +26,8 @@ export default function Dashboard() {
 
 export const getServerSideProps = async ctx => {
     const userToken = getUserToken(ctx)
+    const payload = userToken.split('.')[1];
+    const userName = JSON.parse(atob(payload)).sub;
 
     if (!userToken) {
         return {
@@ -36,6 +38,8 @@ export const getServerSideProps = async ctx => {
     }
 
     return {
-        props: {}
+        props: {
+            userName
+        }
     }
 }
