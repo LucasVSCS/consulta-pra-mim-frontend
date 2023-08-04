@@ -21,7 +21,7 @@ export const login = async (username, password) => {
     const data = await response.json()
 
     setCookie(null, 'token', data.jwtToken, {
-      maxAge: 60,
+      maxAge: 3600000,
       path: '/'
     })
     return { success: true }

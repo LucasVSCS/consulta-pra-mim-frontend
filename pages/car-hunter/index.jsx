@@ -1,4 +1,4 @@
-import {Avatar, Box, Button, Grid, Pagination, Paper, Typography} from '@mui/material'
+import {Box, Button, Grid, Pagination, Paper, Typography} from '@mui/material'
 import Header from '../../components/Header'
 import {useEffect, useState} from 'react'
 import PageTitle from '../../components/PageTitle'
@@ -105,11 +105,26 @@ export default function CarHunterSearchPage() {
                                                     mb: 1,
                                                 }}
                                             >
-                                                <Avatar
-                                                    src={carHunter.logoUrl}
-                                                    alt="Profile Picture"
-                                                    sx={{width: 150, height: 150, cursor: "pointer", mb: 1, mt: 1}}
-                                                />
+                                                <div
+                                                    style={{
+                                                        width: 190,
+                                                        height: 190,
+                                                        cursor: 'pointer',
+                                                        marginBottom: 8,
+                                                        marginTop: 8,
+                                                        display: 'flex',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                    }}
+                                                >
+                                                    <img src={carHunter.logoUrl} alt='Profile Picture'
+                                                         style={{
+                                                             maxWidth: '100%',
+                                                             maxHeight: '100%',
+                                                             objectFit: 'contain'
+                                                         }}
+                                                    />
+                                                </div>
                                                 <Typography align="center">{carHunter.tradingName}</Typography>
                                                 <Typography
                                                     align="center">{`${carHunter.city.name} - ${carHunter.city.ufCode}`}</Typography>

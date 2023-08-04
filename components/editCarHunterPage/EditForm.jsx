@@ -178,11 +178,15 @@ export default function EditForm() {
                                 id='profile-picture-input'
                             />
                             <label htmlFor='profile-picture-input'>
-                                <Avatar
-                                    src={carHunterData.logoUrl}
-                                    alt='Profile Picture'
-                                    sx={{width: 100, height: 100, cursor: 'pointer'}}
-                                />
+                                <div style={{width: 150, height: 150, cursor: 'pointer'}}>
+                                    <img src={carHunterData.logoUrl} alt='Profile Picture'
+                                         style={{
+                                             maxWidth: '100%',
+                                             maxHeight: '100%',
+                                             objectFit: 'contain'
+                                         }}
+                                    />
+                                </div>
                             </label>
                         </Box>
                     </Grid>

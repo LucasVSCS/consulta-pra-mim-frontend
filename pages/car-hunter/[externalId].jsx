@@ -59,7 +59,26 @@ export default function CarHunterDetails() {
                     </Box>
                     <Box sx={{display: 'flex', mt: 2}}>
                         <Box sx={{flex: 0.3, display: 'flex', flexDirection: 'column', p: 2}}>
-                            <Avatar src={carHunter.logoUrl} sx={{ width: 200, height: 200, alignSelf: 'center', mt: 4 }} />
+                            <div
+                                style={{
+                                    width: 200,
+                                    height: 200,
+                                    cursor: 'pointer',
+                                    alignSelf: 'center',
+                                    marginTop: 4,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <img src={carHunter.logoUrl} alt='Profile Picture'
+                                     style={{
+                                         maxWidth: '100%',
+                                         maxHeight: '100%',
+                                         objectFit: 'contain'
+                                     }}
+                                />
+                            </div>
 
                             <SocialMediaLinks socialMedia={carHunter.socialMedia} phones={carHunter.phones}/>
                             <PhoneNumbers phones={carHunter.phones}/>
